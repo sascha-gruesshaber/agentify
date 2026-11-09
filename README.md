@@ -4,7 +4,7 @@ Two Claude Code plugins, in one marketplace.
 
 | Plugin | What it is |
 |---|---|
-| **`lifecycle`** | A committed-spec engineering lifecycle: fourteen callable skills and four sub-agents that take a ticket to a green branch, an open review or a merged one — as far as your repo allows. Reads how *your* repo works from `.agents/`. |
+| **`lifecycle`** | A committed-spec engineering lifecycle: fourteen callable skills and four sub-agents that take a ticket to a green branch, an open review or a watched one — as far as your repo allows. Reads how *your* repo works from `.agents/`. |
 | **`plain-words`** | Report in controlled English. Small words, one idea per sentence, what you did / did it work / what now. Strips the AI tells from everything you write. |
 
 ## Install
@@ -169,7 +169,7 @@ for all of it. Four levers, in the order they actually move cost:
 |---|---|---|
 | **how many agents** | the reviewer list | every agent pays a fixed start-up cost. By far the biggest lever. |
 | **which tier** | per role | a cheap tier where the brief already contains the shape |
-| **how much effort** | your session | the `Agent` tool has no effort parameter, so this is a session setting, not a per-call flag |
+| **how much effort** | per role, where the harness passes it | otherwise it is your session's setting, not a per-call flag |
 | **the output ceiling** | per role | how long a report may run |
 
 The ceiling is **an instruction to the callee, not an enforced limit**, so it is written with a

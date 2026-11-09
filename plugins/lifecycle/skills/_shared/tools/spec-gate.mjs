@@ -3,11 +3,13 @@
 // The spec gate: a spec with a review tier is built only once its walkthrough was signed off, and only
 // while the signed-off requirements, criteria and decisions are still the ones in the file.
 //
-//   spec-gate.mjs check <spec dir>                          exit 1 names what is missing
-//   spec-gate.mjs sign  <spec dir> --via walkthrough|chat
+//   spec-gate.mjs check <spec dir | spec.md>                exit 1 names what is missing
+//   spec-gate.mjs sign  <spec dir | spec.md> --via walkthrough|chat
+//
+// Exit 2 is a usage or I/O error, never a verdict on the spec.
 
 import { createHash } from 'node:crypto'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -53,7 +55,8 @@ export function fingerprint(text) {
 /** The review tier and the sign-off from a spec's header, with a malformed line named per field. */
 export function parseGate(text) {
   const [header] = splitHeader(text)
-  const tier = TIER_LINE.exec(header)?.[1].trim() ?? null
+  // Only the first word is the tier, so "medium · <the clause that sets it>" from /frame still reads.
+  const tier = TIER_LINE.exec(header)?.[1].trim().split(/\s+/)[0] ?? null
   const tierError =
     tier !== null && !TIERS.includes(tier) ? `**Review tier:** "${tier}" is not one of ${TIERS.join(', ')}` : null
 
@@ -103,12 +106,17 @@ function flag(argv, name) {
 }
 
 export function run(argv) {
-  const [command, dir] = argv
-  if (!['check', 'sign'].includes(command) || !dir) {
-    say('usage: spec-gate.mjs check <spec dir> | sign <spec dir> --via walkthrough|chat')
-    return 1
+  const [command, target] = argv
+  if (!['check', 'sign'].includes(command) || !target) {
+    say('usage: spec-gate.mjs check <spec dir | spec.md> | sign <spec dir | spec.md> --via walkthrough|chat')
+    return 2
   }
-  const file = join(dir, 'spec.md')
+  const file = existsSync(target) && statSync(target).isFile() ? target : join(target, 'spec.md')
+  if (!existsSync(file)) {
+    say(`spec-gate: no spec at ${file}`)
+    return 2
+  }
+  const dir = file.replace(/[\\/]?spec\.md$/, '') || '.'
   const text = readFileSync(file, 'utf8')
 
   if (command === 'check') {
@@ -142,6 +150,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exitCode = run(process.argv.slice(2))
   } catch (error) {
     say(error.message)
-    process.exitCode = 1
+    process.exitCode = 2
   }
 }

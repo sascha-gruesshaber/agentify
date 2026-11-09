@@ -24,9 +24,12 @@ jobs:
         working-directory: plugins/lifecycle
         run: node --test "skills/_shared/tools/skills.test.mjs"
 
+      # jsdom is installed here only, so check-page's wiring tests run in CI; the plugin ships without it.
       - name: spec gate and page check tests
         working-directory: plugins/lifecycle
-        run: node --test "skills/_shared/tools/spec-gate.test.mjs" "skills/show/check-page.test.mjs"
+        run: |
+          npm install --no-save --no-package-lock jsdom@24.1.3
+          node --test "skills/_shared/tools/spec-gate.test.mjs" "skills/show/check-page.test.mjs"
 
       - name: every manifest parses
         run: |

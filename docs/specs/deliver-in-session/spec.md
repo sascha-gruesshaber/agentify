@@ -1,5 +1,6 @@
 **Date:** 2026-11-09
-**Status:** Specced
+**Status:** Built
+**Branch:** feat/deliver-in-session
 **Ticket:** none
 
 **Scope:** Replace `/build`'s implementer waves with `/deliver`: the session builds, fresh agents only
@@ -87,7 +88,15 @@ picture of the UI and no check that the spec they agreed to is still the one bei
    does not; asking per run reintroduces the question `/deliver` exists to avoid.
 4. **`check-page.mjs` falls back to a static check** when `jsdom` is not resolvable from the repo, and
    says so. The plugin ships no `node_modules`.
-5. **Not ported:** the source repo's discuss wrapper, retro skill, transcript cost tool, worktree tool and
+5. **`/plan-check` sends one reviewer with all eight axes**, not one per axis. Same reason as the
+   grouped end review: eight agents reading the same two documents pay the start-up cost eight times.
+6. **`/babysit` approves or merges only on the user's word, and only with a command `.agents/forge.md`
+   names.** Without one, the person presses the button. This is not a forge-specific command in the
+   plugin, so it stays inside Out of scope.
+7. **Built directly, without `plan.md` or `/deliver`.** The skills that would plan and build this are
+   the ones it changes; the installed plugin still runs the old `/build`. The end review ran as three
+   fresh reviewers by hand.
+8. **Not ported:** the source repo's discuss wrapper, retro skill, transcript cost tool, worktree tool and
    tracker or forge scripts. Each is tied to that repo's tracker, forge or harness.
 
 ## Constraints

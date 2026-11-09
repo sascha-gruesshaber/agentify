@@ -242,3 +242,37 @@ test('sign refuses without --via', () => {
   assert.equal(code, 1)
   assert.match(out, /--via/)
 })
+
+test('checkSpec passes a heavy spec with a named risk', () => {
+  const result = checkSpec(signedSpec({ tier: 'heavy', risk: 'auth' }))
+
+  assert.equal(result.ok, true)
+})
+
+test('parseGate reads the tier from a line that carries its reason', () => {
+  const { tier, tierError } = parseGate(spec({ tier: 'medium · a new screen' }))
+
+  assert.equal(tier, 'medium')
+  assert.equal(tierError, null)
+})
+
+test('check accepts a path to spec.md as well as its directory', () => {
+  const dir = specDir(spec())
+
+  const { code } = cli('check', join(dir, 'spec.md'))
+
+  assert.equal(code, 0)
+})
+
+test('check exits 2, not 1, when there is no spec to read', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'spec-gate-empty-'))
+
+  const { code, out } = cli('check', dir)
+
+  assert.equal(code, 2)
+  assert.match(out, /no spec at/)
+})
+
+test('a usage error exits 2', () => {
+  assert.equal(cli('check').code, 2)
+})

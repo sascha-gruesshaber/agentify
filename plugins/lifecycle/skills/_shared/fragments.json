@@ -91,10 +91,13 @@
     ],
     "skills/ship/SKILL.md": [
       "repo-config",
+      "gates",
       "tracker-limits"
     ],
     "skills/babysit/SKILL.md": [
-      "repo-config"
+      "repo-config",
+      "gates",
+      "agent-names"
     ]
   },
   "forbids": {

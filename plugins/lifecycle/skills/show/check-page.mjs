@@ -48,7 +48,8 @@ async function domCheck(html, JSDOM) {
 
 /** Returns `{ failure, mode }`: `failure` is null when the page passes; `mode` says which check ran. */
 export async function checkPage(html, { from = process.cwd() } = {}) {
-  const isWalkthrough = /<html[\s>]/i.test(html)
+  // A walkthrough is a whole document; a page-template.html page is a fragment the viewer wraps.
+  const isWalkthrough = /^\s*<!doctype html/i.test(html)
   const bytes = Buffer.byteLength(html, 'utf8')
   if (isWalkthrough && bytes > WALKTHROUGH_LIMIT_BYTES) {
     const mb = (bytes / 1024 / 1024).toFixed(1)
@@ -56,7 +57,6 @@ export async function checkPage(html, { from = process.cwd() } = {}) {
   }
   const jsdom = loadJsdom(from)
   if (!jsdom) return { failure: staticCheck(html), mode: 'static' }
-  // A page-template.html page is a fragment the viewer wraps; a walkthrough is a whole document.
   const doc = isWalkthrough ? html : `<!doctype html><html><head></head><body>${html}</body></html>`
   return { failure: await domCheck(doc, jsdom.JSDOM), mode: 'dom' }
 }

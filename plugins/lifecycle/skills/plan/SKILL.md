@@ -163,7 +163,7 @@ Next to the spec. Committed, like the spec.
 
 ````markdown
 **Date:** YYYY-MM-DD
-**Spec:** `<path to spec.md>` (Specced)
+**Spec:** `<path to spec.md>`
 **Scouted:** <sha> on <date>
 
 ## Approach
@@ -223,8 +223,8 @@ line per task; after each risky task, a `Task N review` line; after each task wi
 `Task N screens` line; at the end, `End review` and `End review fix round`. `- [-]` marks a line
 `/deliver` parked.
 
-**Mark a task `Risky: yes` when it touches authentication, tenancy, permissions, a migration or a wire
-contract.** A fresh reviewer reads that task's commit before the next task starts. Every other task says
+**Mark a task `Risky: yes` when it touches what `.agents/lifecycle.md` § *Reviewers* lists as risky** —
+by default authentication, tenancy, permissions, a migration or a wire contract. A fresh reviewer reads that task's commit before the next task starts. Every other task says
 `no` and is read by the end review. Marking everything risky buys a review per task that measurably does
 not reduce what the end review finds.
 
@@ -260,12 +260,13 @@ confidence is most expensive.
 
 | Call | Model |
 |---|---|
-| build a plan's tasks, and fix what review found | the session's own model — no agent writes production code |
+| build a plan's tasks, and fix what review found | the session's own model — in `/deliver`, no agent writes production code |
+| apply review comments a person wrote, via `/babysit` | `finding-fixer`, `sonnet` |
 | every `change-reviewer`: plan check, task review, screens review, each end-review reviewer | `opus` |
 | the `implementability` spec lens | `opus` |
 | the other spec lenses · scouting | `sonnet` |
 
-- **The most expensive tier is allowed where one missed flaw would be expensive, and is never a
+- **A tier above `opus` is allowed where one missed flaw would be expensive, and is never a
   default.** Name each such step in the plan with one line on why.
 - **A `sonnet` agent blocked on execution gets one re-run on `opus`.** An `opus` agent that fails twice is
   re-scoped, or its question left to the end review.
@@ -276,12 +277,13 @@ confidence is most expensive.
 <!-- shared:budget:start source=budget.md -->
 **How much a call is allowed to cost is configured, not improvised.** `.agents/lifecycle.md` § *Effort
 and budget* sets, per role: the **model tier**, the **reasoning effort**, and a **soft output ceiling**.
-Read it before dispatching, and pass the tier and effort you find there.
+Read it before dispatching. Pass the tier; pass the effort too where your harness's dispatch takes one,
+and otherwise treat it as the effort this session should run at.
 
 Four levers, in the order they actually move cost:
 
-1. **How many calls** — the lens count. Six lenses cost three times two lenses, and this is the largest
-   lever by a distance.
+1. **How many agents** — every agent pays a fixed start-up cost, so grouping lenses into fewer reviewers
+   is the largest lever by a distance.
 2. **Which tier** — a cheap tier on a call whose shape is already written down.
 3. **How much effort** — reasoning effort per call, independent of tier.
 4. **The output ceiling** — how long a report may run.
@@ -300,7 +302,7 @@ Two rules that keep a budget honest:
 - **Report what a phase cost** when the run is over: calls made, tier each ran on, and anything that hit
   its ceiling. A budget nobody measures is a preference.
 - **A budget is a default, not a cap on judgement.** Where a call genuinely needs more — a diff far past
-  what one lens can hold, a security lens over a permission change — take the higher tier and **say in
+  what one reviewer can hold, a security lens over a permission change — take the higher tier and **say in
   one line that you did and why.** Silently overspending and silently underspending are the same defect.
 
 **A budget is tight because of the subscription, not the repo**, so `.agents/lifecycle.md` records which

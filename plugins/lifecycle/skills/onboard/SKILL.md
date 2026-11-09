@@ -180,7 +180,7 @@ with for weeks without knowing why.
 | The lifecycle assumes | Say it out loud when the repo does not |
 |---|---|
 | a **spec is committed before code**, and it is the thing reviews grade against | there is nowhere for specs to live, or specs live outside the repo where a diff cannot show them |
-| **one commit per ticket** | history is many small WIP commits, or squash-on-merge already handles it |
+| **one commit per plan task**, and one per review fix round | history is many small WIP commits, or squash-on-merge already handles it |
 | **docs are part of done**, in the same change | documentation lives elsewhere and drifts by design |
 | **test-first at an agreed seam** | there are no tests, or tests are written after the fact |
 | **a numbered requirement list whose numbers never move** | requirements live in ticket prose |
@@ -192,7 +192,7 @@ Record every declined proposal in `.agents/working-agreement.md` under **Deliber
 with the date and the reason. That entry is what stops the next run re-arguing it.
 
 **One is a genuine blocker, not a preference: a repo that cannot be checked out twice cannot keep a
-feature's tree apart from the main checkout.** Say so, and record in `.agents/working-agreement.md` that
+feature's tree apart from the main checkout.** Say so, and record in `.agents/lifecycle.md` § *Worktrees* that
 work happens on a branch in the main checkout, one feature at a time. Everything else degrades
 gracefully.
 
@@ -205,7 +205,7 @@ for them.
 |---|---|
 | `lifecycle.md` | which phases run, the review tiers, which reviewers and lenses, how many rounds |
 | `gates.md` | the commands that must pass, in order, and what "green" means |
-| `tracker.md` | where specs and tickets live, and what may be written to the board |
+| `tracker.md` | where specs live, and what may be written to the board |
 | `forge.md` | the git host, the ship mode, and how a branch becomes a reviewed change |
 | `preview.md` | how to bring the app up, seed a scenario, screenshot a screen, and where designs live |
 | `docs.md` | where architecture truth lives, the glossary, what "docs are part of done" costs |

@@ -51,7 +51,8 @@ history look like two projects.
 
 ## Tests
 
-Only `plugins/lifecycle/skills/_shared/tools/skills.test.mjs` exists, and it sets the grammar:
+Three test files exist — `skills.test.mjs` and `spec-gate.test.mjs` under `plugins/lifecycle/skills/_shared/tools/`,
+and `check-page.test.mjs` under `plugins/lifecycle/skills/show/` — and they share one grammar:
 
 ```js
 test('<subject> <the behaviour asserted>', () => { … })

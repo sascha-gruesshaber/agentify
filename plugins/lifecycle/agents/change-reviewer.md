@@ -39,8 +39,9 @@ Three rules:
 
 ## How to review
 
-**Read the committed range only** — `git diff <base>...<tip>`, `git log`, `git show`. The session that wrote
-the code may keep working while you run, so take file content out of the range rather than off disk.
+**Read the committed range** — `git diff <base>...<tip>`, `git log`, `git show` — **and the paths the
+caller names**, such as a task's screenshots or a plan not yet committed. The session that wrote the code
+may keep working while you run, so take everything else out of the range rather than off disk.
 
 **Run any skill your lens names inline**, in your own context. You spawn no sub-agents.
 
@@ -76,12 +77,13 @@ once you can say what breaks without the handling.
 <!-- shared:budget:start source=budget.md -->
 **How much a call is allowed to cost is configured, not improvised.** `.agents/lifecycle.md` § *Effort
 and budget* sets, per role: the **model tier**, the **reasoning effort**, and a **soft output ceiling**.
-Read it before dispatching, and pass the tier and effort you find there.
+Read it before dispatching. Pass the tier; pass the effort too where your harness's dispatch takes one,
+and otherwise treat it as the effort this session should run at.
 
 Four levers, in the order they actually move cost:
 
-1. **How many calls** — the lens count. Six lenses cost three times two lenses, and this is the largest
-   lever by a distance.
+1. **How many agents** — every agent pays a fixed start-up cost, so grouping lenses into fewer reviewers
+   is the largest lever by a distance.
 2. **Which tier** — a cheap tier on a call whose shape is already written down.
 3. **How much effort** — reasoning effort per call, independent of tier.
 4. **The output ceiling** — how long a report may run.
@@ -100,7 +102,7 @@ Two rules that keep a budget honest:
 - **Report what a phase cost** when the run is over: calls made, tier each ran on, and anything that hit
   its ceiling. A budget nobody measures is a preference.
 - **A budget is a default, not a cap on judgement.** Where a call genuinely needs more — a diff far past
-  what one lens can hold, a security lens over a permission change — take the higher tier and **say in
+  what one reviewer can hold, a security lens over a permission change — take the higher tier and **say in
   one line that you did and why.** Silently overspending and silently underspending are the same defect.
 
 **A budget is tight because of the subscription, not the repo**, so `.agents/lifecycle.md` records which

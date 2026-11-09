@@ -10,8 +10,9 @@ shape below holds whatever they are.
 | UI task built | 1 `change-reviewer`, the *screens review*, on that task's images | 1 fix round, no re-review |
 | last task built | the standing reviewers plus one per triggered conditional reviewer, in one message | 2 at most; the second needs a written reason and is scoped to the fix range and to the reviewers that found a `must` |
 
-**A task gets its own review only when the plan marks it `Risky: yes`:** it touches authentication,
-tenancy, permissions, a migration or a wire contract. Every other task is read by the end review.
+**A task gets its own review only when the plan marks it `Risky: yes`:** it touches what
+`.agents/lifecycle.md` § *Reviewers* lists as risky — by default authentication, tenancy, permissions, a
+migration or a wire contract. Every other task is read by the end review.
 
 **One fix round per pass, by the session that wrote the code.** What it does not fix goes into the
 implementation record as a deferral, with the reason — never into another review round.

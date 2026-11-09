@@ -59,6 +59,14 @@ It fails when:
 5. a fragment exists that nothing declares — a rule nobody applies is a rule that is wrong without
    anybody finding out.
 
+## The tools
+
+`tools/skills.mjs` is the sync and the check above. `tools/spec-gate.mjs` is the **spec gate**: `sign`
+writes a spec's `**Signed off:**` line with a fingerprint over its requirements, criteria and decisions;
+`check` exits 1 when a tiered spec has no sign-off or the signed sections changed since, and 2 on a usage
+or I/O error. `/spec` signs; `/plan`, `/deliver` and `/advance` check. Each tool has a `node:test` suite
+beside it, run by the gate in `.agents/gates.md`.
+
 ## The two classes of fragment
 
 This is the line that lets one plugin serve many repos.

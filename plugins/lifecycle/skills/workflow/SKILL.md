@@ -85,7 +85,7 @@ what makes this work in a fresh session.
 | is the contract complete? | is `## Open` absent or empty |
 | is it signed off? | `spec-gate.mjs check <spec dir>` (in `<skills>/_shared/tools/`, `<skills>` being the parent of this skill's directory) |
 | is there a plan? | `plan.md` exists |
-| is the plan current? | its `Spec:` header matches, and `Scouted:` is after the last spec commit |
+| is the plan current? | its `Spec:` header names this spec, and no commit after `Scouted:` changed the spec below its header (a status or sign-off line is not a change) |
 | was the plan checked? | `plan-check.md`, and its `**Verdict:**` line |
 | how much is built? | `plan.md`'s `## Build` checklist, and `git log` |
 | what has already been decided alone? | `implementation-record.md` |
@@ -96,7 +96,8 @@ done whether or not its line is checked — say so, and fix the checklist.
 
 ## Step 3 — The state table
 
-Read top to bottom and take the first row that matches.
+Read top to bottom and take the first row that matches. **The status rows come before the plan rows on
+purpose:** once `/deliver` has started, the plan is its progress record, and re-planning would wipe it.
 
 | State | Next phase | Gate? |
 |---|---|---|
@@ -105,18 +106,18 @@ Read top to bottom and take the first row that matches.
 | an effort exists, no `spec.md`, questions unanswered | `/grill` | **halt** — it is an interview |
 | design settled in conversation, no `spec.md` | `/spec` | continue |
 | `spec.md` has a non-empty `## Open` | `/grill` | **halt** — a draft is not a contract |
+| `Status: Shipped` | `/babysit` when the user asks, or the ship mode watches | **halt** — name the review link |
+| `Status: Built`, ship mode `review` or `review+watch` | `/ship` | continue |
+| `Status: Built`, ship mode `branch` or none | — | **halt** — name this repo's ship step from `.agents/forge.md` |
+| `Status: Building`, the spec gate passes | `/deliver` — it resumes at the first unchecked line | continue |
 | `Status: Specced` or `Building`, the spec gate exits 1 | `/spec --revise` | **halt** — the user signs the walkthrough off again |
 | `Status: Specced`, no `plan.md` | `/plan` | continue |
 | `plan.md` exists but is stale for its spec | `/plan` | continue |
 | `plan.md` current, no `plan-check.md` | `/plan-check` | continue |
 | `Verdict: Not ready`, under the re-plan cap | `/plan` | continue |
 | `Verdict: Not ready`, cap reached | — | **halt** — get a person |
-| `Verdict: Ready with changes` | apply them, then `/plan-check` on what changed | continue |
+| `Verdict: Ready with changes`, `Status: Specced` | `/deliver` — it applies them itself and does not check again | continue |
 | `Verdict: Ready to build`, `Status: Specced` | `/deliver` | continue — it asks nothing until its ship mode ends |
-| `Status: Building` | `/deliver` — it resumes at the first unchecked line | continue |
-| `Status: Built`, ship mode `review` or `review+watch` | `/ship` | continue |
-| `Status: Built`, ship mode `branch` or none | — | **halt** — name this repo's ship step from `.agents/forge.md` |
-| `Status: Shipped` | `/babysit` when the user asks, or the ship mode watches | **halt** — name the review link |
 | `Status: Superseded by <path>` | — | **halt** — say so, and offer to advance the spec it names instead |
 
 **A phase `.agents/lifecycle.md` turns off is skipped, and you say you skipped it.** That file is the

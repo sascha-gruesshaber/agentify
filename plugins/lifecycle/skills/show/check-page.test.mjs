@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -10,9 +11,26 @@ const TEMPLATE = readFileSync(join(import.meta.dirname, 'walkthrough-template.ht
 const PAGE = readFileSync(join(import.meta.dirname, 'page-template.html'), 'utf8')
 // A directory with no package.json, so jsdom never resolves and the static check runs.
 const NO_JSDOM = { from: tmpdir() }
+// The plugin directory, where CI installs jsdom for the wiring tests.
+const PLUGIN = { from: join(import.meta.dirname, '..', '..') }
+const hasJsdom = (() => {
+  try {
+    createRequire(join(PLUGIN.from, 'package.json'))('jsdom')
+    return true
+  } catch {
+    return false
+  }
+})()
+const withBlock = (page) => page.replace('<div class="wrap">', '<div class="wrap"><div data-note data-label="Probe">probe</div>')
+const copyNeverEnables = (page) => page.replace('copyBtn.disabled = n === 0;', 'copyBtn.disabled = true;')
 
 test('checkPage passes the walkthrough template', async () => {
   assert.deepEqual(await checkPage(TEMPLATE, NO_JSDOM), { failure: null, mode: 'static' })
+})
+
+test('checkPage treats a page-template fragment as a fragment, not a walkthrough', async () => {
+  const heavyFragment = withBlock(PAGE).replace('</style>', `</style><!-- ${'x'.repeat(WALKTHROUGH_LIMIT_BYTES)} -->`)
+  assert.equal((await checkPage(heavyFragment, NO_JSDOM)).failure, null)
 })
 
 test('checkPage refuses a walkthrough over two megabytes', async () => {
@@ -30,7 +48,18 @@ test('checkPage refuses a page whose notes script was dropped', async () => {
   assert.match((await checkPage(scriptless, NO_JSDOM)).failure, /notes script is missing/)
 })
 
-test('the walkthrough template names a missing input and the review command', () => {
-  assert.match(TEMPLATE, /class="missing"/)
-  assert.match(TEMPLATE, /review command from \.agents\/preview\.md/)
+test('checkPage refuses a page whose tray has no copy button', async () => {
+  const trayless = TEMPLATE.replace('id="copyBtn"', 'id="copyButton"')
+  assert.match((await checkPage(trayless, NO_JSDOM)).failure, /copy button/)
+})
+
+test('checkPage runs the wiring in jsdom and passes both templates', { skip: !hasJsdom && 'jsdom not installed' }, async () => {
+  assert.deepEqual(await checkPage(TEMPLATE, PLUGIN), { failure: null, mode: 'dom' })
+  assert.deepEqual(await checkPage(withBlock(PAGE), PLUGIN), { failure: null, mode: 'dom' })
+})
+
+test('checkPage in jsdom refuses a copy button no note can enable', { skip: !hasJsdom && 'jsdom not installed' }, async () => {
+  const broken = copyNeverEnables(TEMPLATE)
+  assert.equal((await checkPage(broken, NO_JSDOM)).failure, null)
+  assert.match((await checkPage(broken, PLUGIN)).failure, /copy button stays disabled/)
 })

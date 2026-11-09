@@ -156,7 +156,7 @@ Four blocks, in the chat, nothing written to disk:
 
 ```
 **Path:** full · <one clause of why>
-**Review tier:** light | medium | heavy · <the clause that sets it> | none (spike, fast path, or no tiers here)
+**Review tier:** light | medium | heavy · <the clause that sets it>   — omit the line for a spike, the fast path, or a repo without tiers
 **Risk:** none | <what could go wrong in production>
 **Source:** <KEY> (+ 3 comments, 1 linked issue) | the conversation
 

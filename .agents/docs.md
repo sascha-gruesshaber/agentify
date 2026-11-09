@@ -10,7 +10,7 @@ In this order.
 | 2 | **repo rules for agents** | [`../CONTRIBUTING.md`](../CONTRIBUTING.md) — the one rule, the gate, the flag never to add, how to write a skill, versioning, commits. [`../CLAUDE.md`](../CLAUDE.md) is a pointer to it and to this directory, and deliberately holds no rules of its own. |
 | 3 | **architecture** — how the design works | [`../README.md`](../README.md) § *The idea* (law ships in the skills, shape lives in `.agents/`) and [`../plugins/lifecycle/skills/_shared/README.md`](../plugins/lifecycle/skills/_shared/README.md) (the fragment mechanism that enforces it) |
 | 4 | **code conventions**, in prose | [`../CONTRIBUTING.md`](../CONTRIBUTING.md) § *Writing a skill here*. There is no `.editorconfig`, no formatter and no linter — the conventions are entirely prose and review. |
-| 5 | **decisions** — the ones that close off alternatives | [`../ATTRIBUTION.md`](../ATTRIBUTION.md) (ideas taken and five rejected, with reasons) and [`../CONTRIBUTING.md`](../CONTRIBUTING.md) § *What is not proved yet* |
+| 5 | **decisions** — the ones that close off alternatives | [`../ATTRIBUTION.md`](../ATTRIBUTION.md) (ideas taken and ideas rejected, with reasons) and [`../CONTRIBUTING.md`](../CONTRIBUTING.md) § *What is not proved yet* |
 
 ### There is no glossary
 

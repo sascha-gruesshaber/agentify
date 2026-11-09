@@ -97,10 +97,9 @@ and a cheaper reviewer that misses a defect is the most expensive review there i
 | `change-reviewer` — one end-review reviewer | opus | high | 600 |
 | `finding-fixer` — review comments, via `/babysit` | sonnet | medium | 300 |
 
-***Effort is only settable where the harness exposes it.*** The `Agent` tool takes a `model` but **no
-effort parameter**, so a skill dispatching through it cannot set effort — the agent inherits the
-session's. Treat the column as intent: it says which calls deserve a high-effort session, not a flag
-anybody can pass.
+***Effort is only settable where the harness exposes it.*** Some subagent dispatches take an effort,
+some do not; where one does not, the agent inherits the session's. Pass the column where you can, and
+otherwise read it as the effort this session should run at.
 
 **Ceilings are in output tokens, and they are soft.** A callee that cannot finish inside its ceiling
 returns `reviewer-uncertainty` and says what it did not reach. **It never returns a shallow pass that
@@ -109,8 +108,8 @@ fits the budget** — the caller cannot tell that apart from a clean result, and
 ### Per-phase ceilings
 
 Not enforced by anything. They are the number at which a run should stop and ask whether it is still
-doing the right thing. **These are set low, because this is a small repo** — 64 tracked files, one
-tested module. A phase that blows one of these is almost certainly re-reading things it already read.
+doing the right thing. **These are set low, because this is a small repo** — under a hundred
+tracked files, three tested tools. A phase that blows one of these is almost certainly re-reading things it already read.
 
 | Phase | Rough ceiling | What blows it |
 |---|---|---|

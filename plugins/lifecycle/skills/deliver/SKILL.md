@@ -86,7 +86,8 @@ review walkthrough ── Status: Built ── ship mode: branch | review (/ship
 2. **Read its status.**
    - `Specced` → carry on.
    - `Building` → finish this step, then go to [the build loop](#step-4--the-build-loop) at the first
-     unchecked line of `plan.md`'s `## Build`. Every line checked and the record complete → step 6.
+     unchecked line of `plan.md`'s `## Build`. Every line checked → step 5, which completes only what is
+     still owed: the record, the tier, the walkthrough.
    - `Built` → the branch is done; go to step 6 for what the ship mode still owes, or stop if nothing.
    - `Shipped` → name the review from the header and stop.
 
@@ -165,6 +166,10 @@ Print the shape once:
  ends at      <the ship mode, in words: a pushed branch | an open review | a watched review>
 ```
 
+**Images live in `screens/` beside the spec** — `screens/before/` and `screens/after-<N>/` — and are not
+committed; the review walkthrough embeds the ones it shows. A resumed session that finds `screens/before/`
+missing takes the before images again, from the default branch, before the next screens line.
+
 **When a task has `Screens:` and `.agents/preview.md` is configured, take the "before" images now**, in
 the tree as it stands on the default branch, with the commands that file names: bring the app up, seed
 the scenario as it is on the default branch, and screenshot every screen of every task that exists
@@ -221,7 +226,8 @@ line on its own.
 the scenario as the change now has it, and screenshot the task's screens. Then send **one**
 `change-reviewer` with the images as paths, the task's `Reference:`, the plan task, the spec and
 [the screens review](prompts.md#the-screens-review). Triage, fix in **one round**, and write each finding
-into the record's *Screenshot reviews*. Skip the line with a note when this run has no images.
+into the record's *Screenshot reviews*. Commit the fixes and the record with the screens line checked
+off. With no images this run, check the line off with a note in the record.
 
 **The `End review` line**: send the reviewers of [the end review](prompts.md#the-end-review), **all in
 one message**, against `<default-branch>...HEAD`. Run every standing reviewer; add a conditional one only
@@ -290,7 +296,8 @@ the reviews already wrote.
 
 **Judge the review tier again from the diff**, by the definitions in `.agents/lifecycle.md` § *Review
 tiers*. It may go up, never down. Write it as the record's `**Built at review tier:**` line, with the
-reason when it went up. **Never edit the spec header**: the sign-off covers it. Commit the record.
+reason when it went up. **Leave the spec's tier as it is**: it is what the user signed, and the raise
+belongs in the record and the review description. Commit the record.
 
 **For a medium or heavy built tier, write the review walkthrough** with [`show`](../show/SKILL.md),
 shape `walkthrough`, as `review-walkthrough.html` beside the spec, in the language
@@ -371,12 +378,13 @@ paste.
 
 | Call | Model |
 |---|---|
-| build a plan's tasks, and fix what review found | the session's own model — no agent writes production code |
+| build a plan's tasks, and fix what review found | the session's own model — in `/deliver`, no agent writes production code |
+| apply review comments a person wrote, via `/babysit` | `finding-fixer`, `sonnet` |
 | every `change-reviewer`: plan check, task review, screens review, each end-review reviewer | `opus` |
 | the `implementability` spec lens | `opus` |
 | the other spec lenses · scouting | `sonnet` |
 
-- **The most expensive tier is allowed where one missed flaw would be expensive, and is never a
+- **A tier above `opus` is allowed where one missed flaw would be expensive, and is never a
   default.** Name each such step in the plan with one line on why.
 - **A `sonnet` agent blocked on execution gets one re-run on `opus`.** An `opus` agent that fails twice is
   re-scoped, or its question left to the end review.
@@ -400,8 +408,9 @@ shape below holds whatever they are.
 | UI task built | 1 `change-reviewer`, the *screens review*, on that task's images | 1 fix round, no re-review |
 | last task built | the standing reviewers plus one per triggered conditional reviewer, in one message | 2 at most; the second needs a written reason and is scoped to the fix range and to the reviewers that found a `must` |
 
-**A task gets its own review only when the plan marks it `Risky: yes`:** it touches authentication,
-tenancy, permissions, a migration or a wire contract. Every other task is read by the end review.
+**A task gets its own review only when the plan marks it `Risky: yes`:** it touches what
+`.agents/lifecycle.md` § *Reviewers* lists as risky — by default authentication, tenancy, permissions, a
+migration or a wire contract. Every other task is read by the end review.
 
 **One fix round per pass, by the session that wrote the code.** What it does not fix goes into the
 implementation record as a deferral, with the reason — never into another review round.
@@ -415,12 +424,13 @@ look at and what it would cost, and let them ask.
 <!-- shared:budget:start source=budget.md -->
 **How much a call is allowed to cost is configured, not improvised.** `.agents/lifecycle.md` § *Effort
 and budget* sets, per role: the **model tier**, the **reasoning effort**, and a **soft output ceiling**.
-Read it before dispatching, and pass the tier and effort you find there.
+Read it before dispatching. Pass the tier; pass the effort too where your harness's dispatch takes one,
+and otherwise treat it as the effort this session should run at.
 
 Four levers, in the order they actually move cost:
 
-1. **How many calls** — the lens count. Six lenses cost three times two lenses, and this is the largest
-   lever by a distance.
+1. **How many agents** — every agent pays a fixed start-up cost, so grouping lenses into fewer reviewers
+   is the largest lever by a distance.
 2. **Which tier** — a cheap tier on a call whose shape is already written down.
 3. **How much effort** — reasoning effort per call, independent of tier.
 4. **The output ceiling** — how long a report may run.
@@ -439,7 +449,7 @@ Two rules that keep a budget honest:
 - **Report what a phase cost** when the run is over: calls made, tier each ran on, and anything that hit
   its ceiling. A budget nobody measures is a preference.
 - **A budget is a default, not a cap on judgement.** Where a call genuinely needs more — a diff far past
-  what one lens can hold, a security lens over a permission change — take the higher tier and **say in
+  what one reviewer can hold, a security lens over a permission change — take the higher tier and **say in
   one line that you did and why.** Silently overspending and silently underspending are the same defect.
 
 **A budget is tight because of the subscription, not the repo**, so `.agents/lifecycle.md` records which

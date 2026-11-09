@@ -6,12 +6,12 @@
 <title>Spec walkthrough</title>
 <!--
   Walkthrough template: a spec walkthrough or a review walkthrough, committed as
-  docs/specs/<dir>/spec-walkthrough.html or review-walkthrough.html. Rules: show/SKILL.md, shape "walkthrough".
+  spec-walkthrough.html or review-walkthrough.html beside the spec. Rules: show/SKILL.md, shape "walkthrough".
 
   - Overview first, then each section one level deeper. Cut a section the change does not need.
   - Pictures, lists and short sentences. Never restate what a picture shows.
-  - Tokens fall back to the page's own palette, so the file opens in a browser; rendered inline in T3 they
-    take the host's variables (--card, --border, …) instead.
+  - Tokens fall back to the page's own palette, so the file opens in a browser; rendered inline by a host
+    that sets these variables they take the host's (--card, --border, …) instead.
   - The notes script is the same as page-template.html's; change both together.
 -->
 <style>
@@ -150,7 +150,7 @@
   <section>
     <h2>Screens</h2>
     <p>Run this in the review branch's tree. It starts the app, seeds the scenario and prints the links:</p>
-    <pre><code>&lt;the review command from .agents/preview.md&gt; --scenario base --screen &lt;route&gt;</code></pre>
+    <pre><code>&lt;the review command from .agents/preview.md, with the scenario and the changed screens&gt;</code></pre>
     <p class="missing">No images: the preview did not start on the build machine (the reason).</p>
     <div class="box screen" data-note data-label="Screen · name">
       <h3>Screen name</h3>

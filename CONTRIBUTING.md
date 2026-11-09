@@ -89,7 +89,7 @@ Read this before relying on the plugin for work that matters. Each line is a thi
 but has not been *run*.
 
 1. ~~Cross-skill calls across the plugin boundary.~~ **Proven** — `/onboard` chained to `/frame`, and
-   `/deliver` resolves `/plan` and `/plan-check` by name (proven as `/build`, before the rename).
+   the build skill resolves `/plan` and `/plan-check` by name.
 2. ~~`/onboard` against a repo it did not come from.~~ **Proven** — run on this repo. It read the CI
    definition, mapped all eight steps to line numbers, wrote `NOT CONFIGURED` three times rather than
    inventing, and found two hazards nobody had written down.
@@ -103,11 +103,13 @@ but has not been *run*.
 6. **`/deliver`, `/ship` and `/babysit` have not run end to end from this plugin.** The process they
    encode — the session builds, fresh agents review, walkthroughs before and after — is the one the
    source repo builds with today, but the generic wording, the ship-mode routing and the preview seam
-   are new here. `/deliver` is the largest skill and the first to prove.
-7. **The `Effort` column in `.agents/lifecycle.md` is intent, not a setting.** The `Agent` tool takes a
-   `model` but no effort parameter, so a skill dispatching through it cannot set effort. The column says
-   which calls deserve a high-effort *session*; the tier, the ceiling and the lens count are the levers
-   that actually pass.
+   are new here, and so is the sign-off flow (`/spec`'s walkthrough → `spec-gate.mjs sign` → the gate
+   refusing an edited spec in `/plan`, `/deliver` and `/advance`). `/deliver` is the largest skill and the
+   first to prove.
+7. **The `Effort` column in `.agents/lifecycle.md` only binds where the harness passes it.** Some
+   subagent dispatches take an effort and some do not, and the plugin does not depend on either. Where
+   it cannot be passed, the column says which calls deserve a high-effort *session*; the tier, the
+   ceiling and the number of agents are the levers that always pass.
 8. **`/onboard`'s ship-mode recommendation and preview detection are unexercised.** Re-running it on a
    repo with a UI and a forge CLI is what proves both.
 
