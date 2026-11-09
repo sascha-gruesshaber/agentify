@@ -56,8 +56,8 @@ would run instead of the ones that block a merge.
 where it came from:
 
 ```
-`.agents/gates.md`      drafted from azure-pipelines.yml:44-71 + Directory.Build.props
-`.agents/forge.md`      drafted from git remote (dev.azure.com)
+`.agents/gates.md`      drafted from .github/workflows/ci.yml:12-48 + package.json
+`.agents/forge.md`      drafted from git remote (gitlab.com)
 `.agents/naming.md`     drafted from git log — 58 of 60 subjects match <type>(<scope>): <imperative>
 `.agents/docs.md`       NOT FOUND — no architecture docs; needs an answer
 ```

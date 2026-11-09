@@ -4,8 +4,8 @@ Read this with `/onboard` question 6. It turns "how much may one call cost" into
 profiles, because the honest answer depends on something the repo cannot tell you: **which subscription
 is paying for the run.**
 
-> **This is calibrated on one project, not a benchmark.** The numbers below come from a monorepo of
-> roughly a dozen services and three front ends, where this lifecycle built several hundred tasks. Treat
+> **This is calibrated on one project, not a benchmark.** The numbers below come from one production
+> repo where this lifecycle built many features over several months. Treat
 > the *shape* as advice and the numbers as a starting point. **Plan names and prices change** — check
 > current pricing rather than trusting the figures here; the profile is the durable part.
 

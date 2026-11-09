@@ -6,18 +6,19 @@
 **Scope:** Replace `/build`'s implementer waves with `/deliver`: the session builds, fresh agents only
 review. Add review tiers with a signed-off spec walkthrough, a review walkthrough at the end, screenshot
 review of UI tasks, and a configurable end of the run (branch, review, or watched review) that `/onboard`
-picks per repo. Ported from the process a production repo arrived at after ~400 built tickets. It does
+picks per repo. Ported from the process a production repo arrived at after many built features. It does
 not port that repo's tracker, forge or UI tooling.
 
 ## Problem
 
 `/build` hands every ticket to an implementer agent in its own worktree, reviews each ticket, and
-fixes through more agents. Measured on the source repo (3081 agent transcripts):
+fixes through more agents. Measured on the source repo's agent transcripts:
 
-- Implementers used about a quarter of the subagent tokens. The lead that triaged and integrated used
-  15 %, fixers rereading code someone else wrote 13 %, and each implementer paid ~40k to orient itself.
-- A per-ticket review found a `must` in 26 % of runs; the end review after it still found one in 29 %.
-  The per-ticket review did not reduce what the end review found.
+- Hand-overs cost more than the code. Each implementer paid tens of thousands of tokens to orient
+  itself, the lead spent a large share triaging and integrating, and fixers reread code someone else
+  wrote.
+- A per-ticket review found a `must` about as often as the end review after it did. The per-ticket
+  review did not reduce what the end review found.
 - Compaction now holds a long build in one session.
 
 The human's attention also went to the wrong place: decision threads on a finished change, with no

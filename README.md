@@ -209,6 +209,6 @@ one the source repo builds with today. Read it before relying on this for someth
 
 ## Where it came from
 
-The lifecycle grew inside one private .NET monorepo and was rewritten here to depend on nothing about
+The lifecycle grew inside one private project and was rewritten here to depend on nothing about
 it. Ideas were borrowed from several public skill collections; **no code was.** See
 [`ATTRIBUTION.md`](ATTRIBUTION.md).

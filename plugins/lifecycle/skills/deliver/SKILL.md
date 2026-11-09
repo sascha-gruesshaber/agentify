@@ -154,14 +154,14 @@ Print the shape once:
 
 ```
 <KEY> · <feature>                                       7 tasks · 2 risky · 1 UI
- 1  add the bulk-assign operation        api        risky: contract     → task review
- 2  selection state in the table         ui                             → screens review
- 3  wire the panel to the operation      ui
- 4  permission check + audit trail       api, docs  risky: permissions  → task review
+ 1  add the export endpoint              api        risky: contract     → task review
+ 2  export button on the list page       ui                             → screens review
+ 3  wire the button to the endpoint      ui
+ 4  permission check on the export       api, docs  risky: permissions  → task review
  …
  end review   spec alignment · correctness · repo standards · + security & permissions
  I will decide alone
-   · reuse the existing selection state rather than a new store
+   · stream the file rather than build it in memory
  review tier medium (spec) · review walkthrough at the end
  ends at      <the ship mode, in words: a pushed branch | an open review | a watched review>
 ```

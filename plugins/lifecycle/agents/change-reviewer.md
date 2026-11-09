@@ -170,8 +170,8 @@ A bare `clean` is indistinguishable from a lens that did nothing. A page of pros
 the budget this lens was supposed to save. Three lines is the honest middle, and it is a cap.
 
 ```
-[must]   correctness · src/mapper.ts:42 — falls back to the catalog value when the user set one — violates the provenance rule in <document> — check provenance before overwriting
-[should] adjacent · src/StockPanel.tsx:88 — the same fill-bar maths appears three times — extract one helper
+[must]   correctness · src/invoice.ts:42 — rounds each line before summing, so the total is off by a cent — violates the rounding rule in <document> — round once, at the total
+[should] adjacent · src/OrderTable.tsx:88 — the same date formatting appears three times — extract one helper
 [note]   …
 ```
 

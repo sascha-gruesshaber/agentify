@@ -23,7 +23,7 @@ the three are greppable together. Kebab-case, four words or fewer.
 <trailer>
 ```
 
-- **Subject is imperative** — "add the bulk-assign mutation", not "added" or "adds".
+- **Subject is imperative** — "add the export endpoint", not "added" or "adds".
 - **One commit per plan task**, and each review fix round its own commit, so a reviewed range stays as it
   was reviewed.
 - **Trailer:** `<Refs: <KEY>>` when a ticket exists.
