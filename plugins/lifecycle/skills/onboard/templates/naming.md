@@ -11,8 +11,6 @@ the three are greppable together. Kebab-case, four words or fewer.
 ```
 
 - **Types in use:** `<feat | fix | refactor | test | docs | chore | build>`
-- **Per-ticket branches** suffix `-t<NN>`, never `/t<NN>` — git refuses a branch nested under an
-  existing branch name. They are local scaffolding: never pushed, deleted after integration.
 - **Branch model:** <trunk-based off `main` | `develop` + `release/*` | …>
 
 ## Commits
@@ -26,8 +24,8 @@ the three are greppable together. Kebab-case, four words or fewer.
 ```
 
 - **Subject is imperative** — "add the bulk-assign mutation", not "added" or "adds".
-- **One commit per ticket.** The implement-then-fix split is scaffolding the history should not
-  remember.
+- **One commit per plan task**, and each review fix round its own commit, so a reviewed range stays as it
+  was reviewed.
 - **Trailer:** `<Refs: <KEY>>` when a ticket exists.
 - **Never `--no-verify`.**
 - <Any co-author or attribution trailer this repo requires.>

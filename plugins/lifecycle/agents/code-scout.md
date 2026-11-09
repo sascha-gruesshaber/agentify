@@ -19,13 +19,14 @@ and treat them as authority over anything you would otherwise assume.**
 
 | File | Answers |
 |---|---|
-| `.agents/lifecycle.md` | which phases run, which review lenses are in use, how many rounds each loop gets, how wide a wave may be |
+| `.agents/lifecycle.md` | which phases run, the review tiers, which reviewers and lenses are in use, how many rounds each loop gets |
 | `.agents/gates.md` | the commands that must pass, in order, and what "green" means here |
-| `.agents/tracker.md` | where specs and tickets live, and what may be written to the board |
-| `.agents/forge.md` | the git host, and how a branch becomes a reviewed change |
+| `.agents/tracker.md` | where specs live, and what may be written to the board |
+| `.agents/forge.md` | the git host, the ship mode, and how a branch becomes a reviewed change |
+| `.agents/preview.md` | how to bring the app up, seed a scenario and screenshot a screen, and where the design reference lives |
 | `.agents/docs.md` | where architecture truth lives, the glossary, and what "docs are part of done" costs |
 | `.agents/naming.md` | branch, commit, directory and test-name grammar |
-| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, when to stop and ask |
+| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, the walkthrough language, when to stop and ask |
 
 Three rules:
 

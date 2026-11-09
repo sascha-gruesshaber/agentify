@@ -10,7 +10,7 @@ the authority on what blocks a merge**, not this one — if they disagree, fix t
 cd plugins/lifecycle
 node skills/_shared/tools/skills.mjs sync     # only after editing a fragment — rewrites the injected copies
 node skills/_shared/tools/skills.mjs check    # must print "clean"
-node --test "skills/_shared/tools/skills.test.mjs"
+node --test "skills/_shared/tools/skills.test.mjs" "skills/_shared/tools/spec-gate.test.mjs" "skills/show/check-page.test.mjs"
 ```
 
 **Edit the fragment, never the injected copy.** `check` fails on a drifted region, on a document
@@ -67,9 +67,9 @@ Stated once, there, deliberately.
 `node skills/_shared/tools/skills.mjs sync` **writes into 18 tracked documents** — every managed
 region in `plugins/lifecycle/skills/**` and `plugins/lifecycle/agents/**`.
 
-**A ticket that edits a file under `skills/_shared/fragments/` runs alone, never in a parallel wave.**
-Two worktrees each syncing the same fragment produce conflicting copies across up to 18 files, and the
-conflict is in generated text nobody wrote. See [`lifecycle.md`](lifecycle.md) § *Parallelism*.
+**Two features that both edit a file under `skills/_shared/fragments/` conflict in up to 18 files** of
+generated text nobody wrote. Resolve by merging the fragments and running `sync` again, never by hand.
+See [`lifecycle.md`](lifecycle.md) § *Worktrees*.
 
 ## What "test-first" means here, because it means two things
 

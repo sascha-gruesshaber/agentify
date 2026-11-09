@@ -22,13 +22,14 @@ and treat them as authority over anything you would otherwise assume.**
 
 | File | Answers |
 |---|---|
-| `.agents/lifecycle.md` | which phases run, which review lenses are in use, how many rounds each loop gets, how wide a wave may be |
+| `.agents/lifecycle.md` | which phases run, the review tiers, which reviewers and lenses are in use, how many rounds each loop gets |
 | `.agents/gates.md` | the commands that must pass, in order, and what "green" means here |
-| `.agents/tracker.md` | where specs and tickets live, and what may be written to the board |
-| `.agents/forge.md` | the git host, and how a branch becomes a reviewed change |
+| `.agents/tracker.md` | where specs live, and what may be written to the board |
+| `.agents/forge.md` | the git host, the ship mode, and how a branch becomes a reviewed change |
+| `.agents/preview.md` | how to bring the app up, seed a scenario and screenshot a screen, and where the design reference lives |
 | `.agents/docs.md` | where architecture truth lives, the glossary, and what "docs are part of done" costs |
 | `.agents/naming.md` | branch, commit, directory and test-name grammar |
-| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, when to stop and ask |
+| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, the walkthrough language, when to stop and ask |
 
 Three rules:
 
@@ -62,7 +63,7 @@ In this order, and **say which rule matched** in one line:
 
 1. **A path in the argument.** A spec file, or the directory holding one.
 2. **The current branch name.** `.agents/naming.md` maps a branch to its effort directory.
-3. **The most recently modified effort directory** whose spec is neither `Built` nor
+3. **The most recently modified effort directory** whose spec is neither `Built`, `Shipped` nor
    `Superseded by <path>`.
 4. **Nothing found** → there is no work in flight. Say so and offer `/frame`.
 
@@ -82,15 +83,16 @@ what makes this work in a fresh session.
 | is there a contract? | `spec.md` exists |
 | how far has it got? | the spec's `**Status:**` header |
 | is the contract complete? | is `## Open` absent or empty |
+| is it signed off? | `spec-gate.mjs check <spec dir>` (in `<skills>/_shared/tools/`, `<skills>` being the parent of this skill's directory) |
 | is there a plan? | `plan.md` exists |
 | is the plan current? | its `Spec:` header matches, and `Scouted:` is after the last spec commit |
 | was the plan checked? | `plan-check.md`, and its `**Verdict:**` line |
-| is the work split? | `issues/` populated |
-| how much is built? | each ticket's `Status:`, the spec's `**Wave:**`, and `git log` |
-| what has already been decided alone? | `implementation-record.md`, `ledger.md` |
+| how much is built? | `plan.md`'s `## Build` checklist, and `git log` |
+| what has already been decided alone? | `implementation-record.md` |
+| how far may the run go? | `.agents/forge.md` § *Ship mode* |
 
-**`git log` outranks your memory and outranks a stale header.** A ticket whose commit is on the branch is
-done whether or not somebody ticked its box — say so, and fix the header.
+**`git log` outranks your memory and outranks a stale header.** A task whose commit is on the branch is
+done whether or not its line is checked — say so, and fix the checklist.
 
 ## Step 3 — The state table
 
@@ -103,15 +105,18 @@ Read top to bottom and take the first row that matches.
 | an effort exists, no `spec.md`, questions unanswered | `/grill` | **halt** — it is an interview |
 | design settled in conversation, no `spec.md` | `/spec` | continue |
 | `spec.md` has a non-empty `## Open` | `/grill` | **halt** — a draft is not a contract |
+| `Status: Specced` or `Building`, the spec gate exits 1 | `/spec --revise` | **halt** — the user signs the walkthrough off again |
 | `Status: Specced`, no `plan.md` | `/plan` | continue |
 | `plan.md` exists but is stale for its spec | `/plan` | continue |
 | `plan.md` current, no `plan-check.md` | `/plan-check` | continue |
 | `Verdict: Not ready`, under the re-plan cap | `/plan` | continue |
 | `Verdict: Not ready`, cap reached | — | **halt** — get a person |
 | `Verdict: Ready with changes` | apply them, then `/plan-check` on what changed | continue |
-| `Verdict: Ready to build`, `Status: Specced` | `/build` | **halt at its go-ahead** |
-| `Status: Building` | `/build` — it resumes itself | continue |
-| `Status: Built` | — | **halt** — name this repo's ship step from `.agents/forge.md` |
+| `Verdict: Ready to build`, `Status: Specced` | `/deliver` | continue — it asks nothing until its ship mode ends |
+| `Status: Building` | `/deliver` — it resumes at the first unchecked line | continue |
+| `Status: Built`, ship mode `review` or `review+watch` | `/ship` | continue |
+| `Status: Built`, ship mode `branch` or none | — | **halt** — name this repo's ship step from `.agents/forge.md` |
+| `Status: Shipped` | `/babysit` when the user asks, or the ship mode watches | **halt** — name the review link |
 | `Status: Superseded by <path>` | — | **halt** — say so, and offer to advance the spec it names instead |
 
 **A phase `.agents/lifecycle.md` turns off is skipped, and you say you skipped it.** That file is the
@@ -119,8 +124,8 @@ authority on which phases exist here; a repo that does not use `/plan-check` sho
 missing one.
 
 **A state not in this table is a real finding.** Say what you observed, say it does not match a known
-state, and stop. **Never pick the nearest row.** A `plan.md` beside a spec that says `Built`, a populated
-`issues/` with no plan, a `Verdict:` line you cannot parse — each of those means something happened that
+state, and stop. **Never pick the nearest row.** A `plan.md` beside a spec that says `Specced` with
+every `## Build` line checked, a `Verdict:` line you cannot parse — each of those means something happened that
 this table does not model, and guessing costs more than asking.
 
 ## Step 4 — Report, then run
@@ -131,9 +136,9 @@ phases later:
 ```
 effort    <path>            (matched by: branch name)
 status    Specced
-beside    plan.md ✓   plan-check.md ✗   issues/ —
-next      /plan, then /plan-check
-halting   before /build, to show you the shape
+beside    plan.md ✓   plan-check.md ✗   signed off ✓
+next      /plan-check, then /deliver
+ends at   an open review   (ship mode: review)
 
 running /plan …
 ```
@@ -155,9 +160,9 @@ A halt is a result, not a failure. **Say three things and stop:**
 3. **the exact next command**, or the exact question that needs answering.
 
 ```
-halted   /build is ready to run but wants one go-ahead on the shape
-stands   Specced · plan.md + plan-check.md committed · Verdict: Ready to build
-next     /build          (or /advance again — it will offer the same go-ahead)
+halted   the spec changed after its sign-off
+stands   Specced · spec-gate: requirements, criteria or decisions changed since the sign-off
+next     /spec --revise <spec dir> — then sign the walkthrough off again
 ```
 
 **Never halt silently, and never halt without naming the next move.** A driver that stops without saying
@@ -166,10 +171,9 @@ something broke.
 
 ## What halts a run, in full
 
-- **Every interactive phase** — `/onboard`, `/frame`, `/grill`. Their whole value is that a person
-  answers, and answering for them defeats the purpose.
-- **`/build`'s single go-ahead.** It is the one interruption in the unattended half, and it is
-  deliberate.
+- **Every interactive phase** — `/onboard`, `/frame`, `/grill`, and `/spec`'s sign-off. Their whole
+  value is that a person answers, and answering for them defeats the purpose.
+- **A spec the spec gate refuses.** The sign-off is the person's, never the driver's.
 - **A verdict or a cap** — `Not ready` twice, a fix loop past its round cap, a failing gate.
 - **An unknown state**, per step 3.
 - **Outside working hours**, where `.agents/working-agreement.md` sets them. Run the phase you are on if
@@ -182,8 +186,9 @@ something broke.
   is a second planner nobody reviews.
 - **Never skip a gate because the answer looks obvious.** The gates are where the expensive mistakes get
   caught.
-- **Never edit a spec, a plan or a ticket** — beyond correcting a status line that `git log` contradicts,
-  which you report in one line.
+- **Never edit a spec or a plan** — beyond correcting a status line or a checklist line that `git log`
+  contradicts, which you report in one line.
+- **Never sign a spec off.** Only `/spec` does, on the user's word.
 - **Never advance an effort the user did not name when two are in flight.**
 
 ## Dispatching the agents

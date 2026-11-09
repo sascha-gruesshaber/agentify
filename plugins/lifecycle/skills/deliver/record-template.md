@@ -1,11 +1,11 @@
 # Implementation record template
 
-Copy to `implementation-record.md` beside the spec at the start of a [`build`](SKILL.md) run and append
-as the build runs. It is the counterpart to the spec: the spec says what was decided *before* the code,
-this says what had to be decided *while writing it*, and by whom.
+[`deliver`](SKILL.md) writes `implementation-record.md` beside the spec in this shape, as reviews
+close and complete at the end. The spec says what was decided *before* the code; the record says what
+was decided *while writing it*.
 
-It is **not** a build log. No tool output, no gate results, no "then I ran the tests" — CI proves that,
-and the review does not repeat it either.
+It is **not** a build log: no tool output, no gate results. CI proves those. It holds only what a reader
+could expect to go the other way, what waits for later, and what changes how the system is operated.
 
 ```markdown
 # <Topic> — Implementation Record
@@ -13,43 +13,51 @@ and the review does not repeat it either.
 **Date:** YYYY-MM-DD
 **Spec:** [spec.md](spec.md)
 **Ticket:** <KEY> | none
-**Built as:** N tickets in M waves | a single unit
-
-## How it was cut
-
-One paragraph: why this split (or no split), and what the parallel waves were. Enough that someone
-re-running the feature would cut it the same way. Name any ticket that ran on a cheaper model than the
-session's, in one clause — it is the first thing worth revisiting if that ticket comes back in review.
+**Built as:** N tasks
+**Built at review tier:** light | medium | heavy — <"as the spec said", or "raised from <tier>: <why>"> | none (untiered spec)
 
 ## Decisions
 
-One row per call made without asking, and only the ones a reader could have expected to go the other
-way. A decision with no live alternative is not a decision.
+One row per call made without asking that a reader could expect to go the other way.
 
 | # | Decision | Why | Passed over | Confirm? |
 |---|---|---|---|---|
 | 1 | <what was chosen, one line> | <the reason, one line> | <the alternative and why not> | yes/no |
 
-`Confirm? = yes` means a human should look at it. Reserve it for calls that are cheap to reverse now and
-expensive later, or where a reasonable reviewer would have chosen differently.
+`Confirm? = yes` puts it on the review walkthrough, with the choice above as the recommendation that is
+built. Use it for calls that are cheap to reverse now and expensive later, or where a reasonable
+reviewer would choose differently. [`babysit`](../babysit/SKILL.md) writes the user's answer in as
+`answered: <answer>`. **A decision still unanswered when the review merges accepts the recommendation.**
 
 ## Deferred
 
-Findings that were real but not worth fixing in this change, from the per-ticket reviews and the sweep.
+Real findings that wait for a later change: review findings triaged as *defer*, plan-check changes that
+could not be applied, and a parked task. They become the review description's "worth knowing" bullets.
 
-- `<file or area>` — <finding> — <why it waits>
+- `<file or area>` — <finding> — <why it waits>; an `adjacent` cleanup says *worth a follow-up*
+
+## Screenshot reviews
+
+Only when the plan has a task with `Screens:`: one line per screens review, its findings fixed or
+deferred, or "no findings". A run without images says why. Delete the section otherwise.
+
+- Task <N> · <screens> — <finding> — fixed | deferred: <why> | no findings
+
+## Second pass
+
+Only when the end review ran twice: the reason, in one line. Delete the section otherwise.
 
 ## Worth knowing
 
 Anything that changes how the system behaves or is operated: migrations, config or secrets, a contract
-other services consume, something deliberately left undone, a parked ticket.
+other systems consume, something deliberately left undone.
 ```
 
 ## Rules
 
-- **Append as you go.** Written at the end it is a reconstruction, and the reasons are already gone.
+- **Write it as you go.** Written at the end it is a reconstruction, and the reasons are already gone.
 - **A decision needs a live alternative.** "Used the existing table component" counts only if writing a
-  new one was genuinely on the table.
+  new one was a real option.
 - **Plain technical wording.** A reviewer skims this in a minute; it is not a decision record.
-- A decision that closes off alternatives *across* the codebase earns its own decision record instead,
-  where `.agents/docs.md` says those live. Propose it; the numbering is the user's.
+- A decision that closes off alternatives *across* the codebase earns its own decision record, where
+  `.agents/docs.md` says those live. Propose it; the numbering is the user's.

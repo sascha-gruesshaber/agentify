@@ -1,6 +1,6 @@
 ---
 name: show
-description: Put something in front of the user as a page they can point at — a process flow, a set of options, a spec, a before-and-after, run progress — published as an artifact, opened in whatever browser this machine has, with every block annotatable so their notes come back labelled. Use when a picture would land better than prose, when a decision needs comparing side by side, or when someone says "show me", "draw it", "let me see it", "I want to comment on that". Keywords - show, show me, draw it, diagram, visualise, mockup, flow chart, options, side by side, let me see, annotate, comment on it, feedback page.
+description: Put something in front of the user as a page they can point at — a process flow, a set of options, a spec, a before-and-after, run progress — with every block annotatable so their notes come back labelled. Also builds the spec and review walkthroughs. Use when a picture would land better than prose, when a decision needs comparing side by side, or when someone says "show me", "draw it", "let me see it", "I want to comment on that". Keywords - show, show me, draw it, diagram, visualise, mockup, flow chart, options, side by side, let me see, annotate, comment on it, feedback page.
 ---
 
 # Show (a thing → a page you can point at)
@@ -26,7 +26,7 @@ tokens to build it.
 
 ## Step 1 — Pick the shape
 
-Four shapes cover almost everything. The skeleton and the classes for all of them are in
+Five shapes cover almost everything. The skeleton and the classes for all of them are in
 [`page-template.html`](page-template.html) — **start from it rather than rebuilding the annotation
 machinery**, which has bitten this skill twice.
 
@@ -36,12 +36,30 @@ machinery**, which has bitten this skill twice.
 | **decision sheet** | open questions from a grilling round | one `.card` per question, two to four options, the recommendation marked |
 | **document review** | a spec or plan they must agree with | one row per numbered requirement, each annotatable |
 | **before and after** | a refactor, a data-model change, a layout change | two `.split` panels side by side |
+| **walkthrough** | the spec walkthrough at the end of `/spec`, the review walkthrough at the end of `/deliver` | the sections of [`walkthrough-template.html`](walkthrough-template.html), overview first |
 
 **Draw the gaps.** A dashed red box where a thing is missing says more than a paragraph about it.
 
+### The walkthrough shape has its own rules
+
+- **Start from `walkthrough-template.html`, a whole document** that opens in any browser. Its notes
+  script is the same as `page-template.html`'s, so change both together.
+- **Overview first, then one level deeper per section.** Cut every section the change does not need.
+- **Pictures, lists and short sentences.** Never restate what a picture shows, never paraphrase the spec.
+  The user reads this *instead of* the spec, so every extra sentence is one they skip.
+- **In the language `.agents/working-agreement.md` names for walkthroughs**; English when it names none.
+  Translate the template's headings and tray texts when the language differs.
+- **Write it beside the spec, as `spec-walkthrough.html` or `review-walkthrough.html`.** Rewrite the same
+  file each round, and commit it with the spec or before the review opens.
+- **Screenshots go in as `data:` images** and the page stays under 2 MB; `check-page.mjs` refuses a
+  heavier walkthrough. A review walkthrough names the review command from `.agents/preview.md`, and says
+  which input was missing when a screen has no image.
+- **A spec walkthrough shows every changed user flow as a UI mock** — a sketch on the page is enough.
+
 ## Step 2 — Build it
 
-Write the file to the session scratchpad, **not into the repo**. If an `artifact-design` skill is
+Write the file to the session scratchpad, **not into the repo** — except a walkthrough, which goes beside
+its spec. If an `artifact-design` skill is
 available, load it before writing — it calibrates how much design the page actually warrants.
 
 **Every block the user might comment on carries two attributes:**
@@ -65,23 +83,23 @@ Three rules the template already obeys, learned the hard way:
   returns false and the handler does nothing at all. Use a two-tap button.
 - **Key notes by `data-label`, not by index.** Then a note survives the page gaining a section.
 
-**Verify it before you publish.** Where the repo has `jsdom` available, load the page in it, count that
-`[data-note]` and `.noteBtn` come out equal, type into a box, and check the copy button enables. Where it
-does not, at minimum grep that every `data-note` block also carries a `data-label`. **A page whose
-annotation is broken is worse than prose, because the user finds out only after writing.**
+**Verify it before you show it:** `node <skill dir>/check-page.mjs <file>`, where `<skill dir>` is this
+skill's own directory. Where the repo has `jsdom` installed, it loads the page, checks that every
+`[data-note]` block got its note button and that typing a note enables the copy button; otherwise it runs
+a static check and says so. It exits 1 and names the failure. **A page whose annotation is broken is
+worse than prose, because the user finds out only after writing.**
 
-## Step 3 — Publish and open it
+## Step 3 — Put it in front of them
 
-Publish with the `Artifact` tool. **Same file path means the same URL** — republish in place as the topic
-moves. One link per topic, never a new link per round; a second link means the user is reading a stale
-copy.
+**A walkthrough is shown, not published:** it is a committed file. Render it inline where your harness
+can render HTML; otherwise open it in the machine's default browser, or name the file for them to open.
 
-Then hand the URL to [`operator-view`](../../agents/operator-view.md), which walks a ladder and stops at
-the first surface that exists: an embedded browser pane in the user's own window if the tooling offers
-one, else the machine's default browser, else nothing. **It is cosmetic and never blocks** — carry on
-without waiting for its answer, and never treat "no display surface" as a failure.
+Every other shape: publish it where your harness can host a page, and **keep one link per topic** —
+republish to the same place as the topic moves, never a new link per round; a second link means the
+user is reading a stale copy. Where nothing can host it, open the file locally or name it.
 
-Give the link in chat as well. That is the fallback that always works.
+Give the link or the path in chat as well. That is the fallback that always works, and **no display
+surface is never a failure.**
 
 ## Step 4 — Say what is on it, then stop
 
@@ -112,15 +130,3 @@ The paste-back is the one seam here: **the published page cannot send anything a
 sandbox blocks every outbound request. If that starts to grate, the upgrade is a local companion server
 that turns a click into a file this session reads on its next turn. **That is a deliberate future step,
 not a gap to work around now.** Do not try to make the artifact phone home.
-
-## Dispatching the agents
-
-<!-- shared:agent-names:start source=agent-names.md -->
-**These agents ship inside this plugin, so their `subagent_type` carries the plugin prefix:**
-`lifecycle:code-scout`, `lifecycle:spec-reviewer`, `lifecycle:change-reviewer`,
-`lifecycle:ticket-implementer`, `lifecycle:finding-fixer`, `lifecycle:operator-view`.
-
-A bare name may resolve, and it may also pick up a different agent the repo happens to define. **Pass
-the prefixed form.** Where this document links an agent by file, the prefixed name is what goes in the
-dispatch.
-<!-- shared:agent-names:end -->

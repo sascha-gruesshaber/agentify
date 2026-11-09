@@ -13,7 +13,7 @@ Turn a spec into work somebody can execute, **after reading the code it will cha
 > `path:line` somebody actually opened — which is exactly what
 > [`plan-check`](../plan-check/SKILL.md) then verifies.
 
-**This skill plans. It never implements.** Writing the code is [`build`](../build/SKILL.md).
+**This skill plans. It never implements.** Writing the code is [`deliver`](../deliver/SKILL.md).
 
 <!-- shared:repo-config:start source=repo-config.md -->
 **This repo describes itself in `.agents/`, at the repository root. Read the files that bind your step,
@@ -21,13 +21,14 @@ and treat them as authority over anything you would otherwise assume.**
 
 | File | Answers |
 |---|---|
-| `.agents/lifecycle.md` | which phases run, which review lenses are in use, how many rounds each loop gets, how wide a wave may be |
+| `.agents/lifecycle.md` | which phases run, the review tiers, which reviewers and lenses are in use, how many rounds each loop gets |
 | `.agents/gates.md` | the commands that must pass, in order, and what "green" means here |
-| `.agents/tracker.md` | where specs and tickets live, and what may be written to the board |
-| `.agents/forge.md` | the git host, and how a branch becomes a reviewed change |
+| `.agents/tracker.md` | where specs live, and what may be written to the board |
+| `.agents/forge.md` | the git host, the ship mode, and how a branch becomes a reviewed change |
+| `.agents/preview.md` | how to bring the app up, seed a scenario and screenshot a screen, and where the design reference lives |
 | `.agents/docs.md` | where architecture truth lives, the glossary, and what "docs are part of done" costs |
 | `.agents/naming.md` | branch, commit, directory and test-name grammar |
-| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, when to stop and ask |
+| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, the walkthrough language, when to stop and ask |
 
 Three rules:
 
@@ -79,11 +80,15 @@ summary, and name the open questions.
 absence as a missing requirement, and the round trip is spent explaining that nobody asked for it.
 <!-- shared:spec-shape:end -->
 
-## Step 1 — Read the spec, and refuse a draft
+## Step 1 — Read the spec, and refuse a draft or an unsigned one
 
 Resolve the spec from `.agents/tracker.md` and read its status line. **A spec marked draft, or carrying
-a non-empty `## Open`, stops the run.** Name the open questions and point at `/grill`. This is the only
-refusal here and it is worth keeping.
+a non-empty `## Open`, stops the run.** Name the open questions and point at `/grill`. Then run the spec gate:
+`node <skills>/_shared/tools/spec-gate.mjs check <spec dir>`, where `<skills>` is the parent of this skill's
+own directory. Exit 1 — a tiered spec with no
+sign-off, or one whose requirements, criteria or decisions changed since it — stops the run with its
+line and sends the spec back to `/spec --revise`. These are the only refusals here, and both are worth
+keeping.
 
 **`## Constraints` is binding.** Those are the edge cases somebody settled deliberately; a plan that
 quietly re-decides one has thrown away the only record of the decision.
@@ -173,13 +178,26 @@ Next to the spec. Committed, like the spec.
 
 ## Test seams
 
-- `<seam>` — observes requirement <n>. Existing (`path:line`) | new, because <nothing existing observes it>.
+- `<seam>` — observes requirement <n>; misses: <what it cannot see>. Existing (`path:line`) | new, because <nothing existing observes it>.
+
+## Build
+
+- [ ] Task 1 — <imperative title>
+- [ ] Task 2 — <imperative title>
+- [ ] Task 2 review
+- [ ] Task 2 screens
+- [ ] End review
+- [ ] End review fix round
 
 ## Task 1 — <imperative title>
 
+**Risky:** no
 **Files:** `path/one`, `path/two`
 **Today:** <what the code does now> (`path/one:120`)
 **Reuse:** <the nearest existing thing to copy> (`path/other:44`)
+**Reference:** <the design reference this screen follows, from `.agents/preview.md`> | none
+**Screens:** <the routes or screens this task changes> | none
+**Scenario:** <the seed scenario these screens are checked with, and what this task adds to it> | none
 **Change:** <what to do — behaviour, not a diff>
 **Test:** <which test, at which seam, at which level>
 **Verify:** `<command>` → <what passing looks like>
@@ -199,9 +217,26 @@ Next to the spec. Committed, like the spec.
 - <any criterion no seam can observe>
 ````
 
-**`Consumes` and `Produces` are not decoration.** An implementer sees only its own task. That block is
-how it learns the exact names its neighbours use, and it is what stops two parallel tickets inventing
-two names for one thing and colliding at integration.
+**`## Build` is the run's progress.** `/deliver` builds its lines top to bottom and checks each one off in
+the commit that completes it, so a compacted or a new session resumes at the first unchecked line. One
+line per task; after each risky task, a `Task N review` line; after each task with `Screens:`, a
+`Task N screens` line; at the end, `End review` and `End review fix round`. `- [-]` marks a line
+`/deliver` parked.
+
+**Mark a task `Risky: yes` when it touches authentication, tenancy, permissions, a migration or a wire
+contract.** A fresh reviewer reads that task's commit before the next task starts. Every other task says
+`no` and is read by the end review. Marking everything risky buys a review per task that measurably does
+not reduce what the end review finds.
+
+**A task that changes a screen names its `Screens:`, `Scenario:` and `Reference:`.** The screens are what
+`/deliver` photographs and a fresh reviewer reads against the reference; the scenario gives them the data
+they need. When no scenario has that data yet, the task adds it in the same change. When
+`.agents/preview.md` is not configured, write the lines anyway — they tell the end review which screens
+changed — and say once that no images will be taken.
+
+**`Consumes` and `Produces` are required.** By the time a later task is built, the session may have
+compacted away the earlier one. These lines keep the exact names each task relies on in the plan, so
+nothing is renamed from memory.
 
 **`## Unresolved` is mandatory and never empty by omission.** When there is genuinely nothing, write
 "Nothing unresolved." An absent section reads as full confidence, and a plan is exactly where unfounded
@@ -216,33 +251,27 @@ confidence is most expensive.
   one-commit-per-task rule is fiction.
 - **Order by dependency**, and say what each task assumes is already done.
 - **Do not inline the code.** Name the behaviour, the file and the test. Pasted code blocks go stale the
-  moment the repo moves, and the implementer is better at writing them than you are at guessing them.
+  moment the repo moves, and the session that builds the task is better at writing them than you are at
+  guessing them.
 
 <!-- shared:model-choice:start source=model-choice.md -->
-**The session model is a ceiling, not a per-agent default.** Picking the tier per call is part of
-orchestrating. An omitted model inherits the session's — usually the most expensive one.
+**The session builds; agents review and scout.** A call names its model only where this table says so.
+`.agents/lifecycle.md` § *Effort and budget* may lower a row for cost; it says so when it does.
 
-| Call | Model | Why |
-|---|---|---|
-| review, any lens | `sonnet` | One lens, a pinned range, a rule to quote, a terse report. Several run at once. |
-| scout / investigate | `sonnet` | Locating code and citing `file:line`. No design judgement. |
-| implement a **mechanical** slice | `sonnet` | The shape is already written down: a page copied from a named existing page, a rename across call sites, wiring that follows an existing seam, a regenerated client, documentation. |
-| implement a **design-carrying** slice | inherit | New seams, schema and wire contracts, permissions, concurrency. |
-| fix an already-triaged finding list | `sonnet` | Bounded work with the reasoning done. |
-| fix the whole-feature sweep | `opus` | Cross-cutting findings and the last write before review. |
+| Call | Model |
+|---|---|
+| build a plan's tasks, and fix what review found | the session's own model — no agent writes production code |
+| every `change-reviewer`: plan check, task review, screens review, each end-review reviewer | `opus` |
+| the `implementability` spec lens | `opus` |
+| the other spec lenses · scouting | `sonnet` |
 
-Three rules:
-
-- **Turn count beats token price.** A cheap model routinely takes two or three times the turns on
-  multi-step work, which costs more overall. Use the cheap tier when the brief contains the shape;
-  otherwise start one tier up.
-- **A `sonnet` agent that fails its gates twice on the same thing gets one re-run on `opus`** — the
-  failure is as likely to be the tier as the task. After that, re-scope or park.
-- **Escalate a reviewer deliberately**, not by default: for correctness or spec alignment over a sweep of
-  more than about fifteen changed files, or when a lens returned clean on a diff you have concrete reason
-  to distrust. Escalating every lens costs the price of the build again.
-
-Name the cheap-tier slices in the plan, so one go-ahead covers the choice.
+- **The most expensive tier is allowed where one missed flaw would be expensive, and is never a
+  default.** Name each such step in the plan with one line on why.
+- **A `sonnet` agent blocked on execution gets one re-run on `opus`.** An `opus` agent that fails twice is
+  re-scoped, or its question left to the end review.
+- **Fewer agents beat thinner agents.** Every agent pays a fixed start-up cost before it reads a line —
+  on the order of 15–20k tokens — so merging two lenses into one reviewer saves more than trimming a
+  tool list or picking a cheaper tier.
 <!-- shared:model-choice:end -->
 <!-- shared:budget:start source=budget.md -->
 **How much a call is allowed to cost is configured, not improvised.** `.agents/lifecycle.md` § *Effort
@@ -304,7 +333,7 @@ which are deferred, **every area whose scout returned `NOT LOCATED` by name**, a
 <!-- shared:agent-names:start source=agent-names.md -->
 **These agents ship inside this plugin, so their `subagent_type` carries the plugin prefix:**
 `lifecycle:code-scout`, `lifecycle:spec-reviewer`, `lifecycle:change-reviewer`,
-`lifecycle:ticket-implementer`, `lifecycle:finding-fixer`, `lifecycle:operator-view`.
+`lifecycle:finding-fixer`.
 
 A bare name may resolve, and it may also pick up a different agent the repo happens to define. **Pass
 the prefixed form.** Where this document links an agent by file, the prefixed name is what goes in the

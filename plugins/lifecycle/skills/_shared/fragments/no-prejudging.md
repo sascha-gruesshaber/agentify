@@ -8,8 +8,8 @@ Two rules that follow:
 
 - **Do not add open-ended directives** — "check all uses", "run the race tests if useful" — without a
   concrete, task-specific reason. They cost a reviewer's whole budget and return nothing.
-- **Do not ask a reviewer to re-run tests the implementer already ran on the same code.** The
-  implementer's report carries that evidence.
+- **Do not ask a reviewer to re-run the gates the session already ran on the same commit.** The
+  commit is gated; a reviewer reads, it does not rebuild.
 
 **Triage is the caller's job, not the reviewer's.** A reviewer that filters while it looks leaves buckets
 empty for the wrong reason: cover first, filter second, and judge severity as a separate pass over a list

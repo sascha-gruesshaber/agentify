@@ -15,4 +15,4 @@ the review lenses, the effort budget, the working agreement. **It is authority.*
   copy. See [`CONTRIBUTING.md`](CONTRIBUTING.md) § *A change here does not affect the session that made
   it*.
 - **Edit the fragment, never the injected copy.** `skills.mjs sync` writes into 18 tracked documents, so
-  a fragment edit runs alone and never in a parallel wave.
+  resolve a conflict in one by fixing the fragment and syncing again.

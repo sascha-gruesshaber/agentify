@@ -1,12 +1,12 @@
 ---
 name: spec
-description: Write the settled design down as the contract — one numbered list of requirements, one numbered list of acceptance criteria, the decisions and what they ruled out. States WHAT, never HOW. Commits the spec where the repo keeps them, at Status Specced, where `/plan` and `/build` pick it up. Use after a design is agreed, when someone asks to "write it up", "spec it out", "pin down the requirements", or to revise a spec the work has outgrown. Keywords - spec, write it up, spec it out, requirements, acceptance criteria, the contract, pin it down, revise the spec.
+description: Write the settled design down as the contract — one numbered list of requirements, one numbered list of acceptance criteria, the decisions and what they ruled out. States WHAT, never HOW. Commits the spec where the repo keeps them, at Status Specced, where `/plan` and `/deliver` pick it up. Where the repo uses review tiers, shows the user a spec walkthrough (or a chat summary for a light change) and records their sign-off before the commit. Use after a design is agreed, when someone asks to "write it up", "spec it out", "pin down the requirements", or to revise a spec the work has outgrown. Keywords - spec, write it up, spec it out, requirements, acceptance criteria, the contract, pin it down, revise the spec.
 ---
 
 # Spec (a settled design → the contract)
 
 Turn the agreed design into a document that can be **graded**. That is the whole difference between a
-spec and a conversation: `/plan`, every reviewer and `/build` all measure their work against this file,
+spec and a conversation: `/plan`, every reviewer and `/deliver` all measure their work against this file,
 and against a conversation they measure against nothing.
 
 Runs after [`grill`](../grill/SKILL.md) reaches an empty frontier.
@@ -17,13 +17,14 @@ and treat them as authority over anything you would otherwise assume.**
 
 | File | Answers |
 |---|---|
-| `.agents/lifecycle.md` | which phases run, which review lenses are in use, how many rounds each loop gets, how wide a wave may be |
+| `.agents/lifecycle.md` | which phases run, the review tiers, which reviewers and lenses are in use, how many rounds each loop gets |
 | `.agents/gates.md` | the commands that must pass, in order, and what "green" means here |
-| `.agents/tracker.md` | where specs and tickets live, and what may be written to the board |
-| `.agents/forge.md` | the git host, and how a branch becomes a reviewed change |
+| `.agents/tracker.md` | where specs live, and what may be written to the board |
+| `.agents/forge.md` | the git host, the ship mode, and how a branch becomes a reviewed change |
+| `.agents/preview.md` | how to bring the app up, seed a scenario and screenshot a screen, and where the design reference lives |
 | `.agents/docs.md` | where architecture truth lives, the glossary, and what "docs are part of done" costs |
 | `.agents/naming.md` | branch, commit, directory and test-name grammar |
-| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, when to stop and ask |
+| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, the walkthrough language, when to stop and ask |
 
 Three rules:
 
@@ -90,6 +91,9 @@ all. Do not put it anywhere else.
 **Date:** YYYY-MM-DD
 **Status:** Specced
 **Ticket:** <KEY> | none
+**Risk:** none | <what could go wrong in production: data, auth, a contract, a migration>
+**Review tier:** light | medium | heavy   ← only where `.agents/lifecycle.md` uses review tiers
+**Signed off:** YYYY-MM-DD · walkthrough | chat · <fingerprint>   ← written by spec-gate.mjs sign, never by hand
 
 **Scope:** One paragraph — what this covers and what it deliberately doesn't.
 
@@ -131,8 +135,9 @@ stands, and **no skill re-derives state from a branch name or a directory listin
 | `**Status:**` | Means | Set by |
 |---|---|---|
 | `Specced` | designed and agreed, nothing built | `/spec`, when it commits |
-| `Building` | in flight; `**Wave:** n of m` says how far | `/build`, on the go-ahead and after each wave |
-| `Built` | the branch is green; `**Branch:**` carries the name | `/build`, at the end |
+| `Building` | in flight; `plan.md`'s `## Build` checklist says how far | `/deliver`, when it starts building |
+| `Built` | the branch is green and pushed; `**Branch:**` carries the name | `/deliver`, at the end |
+| `Shipped` | the review is open; `**Review:**` carries the link | `/ship` |
 | `Superseded by <path>` | a later spec replaced this one | whoever wrote the replacement |
 
 **A stale header is worse than no header, because the next run trusts it.** `Superseded by` is the one
@@ -140,6 +145,11 @@ that gets forgotten: a spec replaced by a later one and left at `Specced` is a s
 happily pick up and plan.
 
 Anything beyond this table is not a status. Do not invent one.
+
+**`Risk:` and `Review tier:` are proposed by `/frame`**, by the definitions in `.agents/lifecycle.md` §
+*Review tiers*. A `Risk:` other than `none` makes the tier `heavy`; the spec gate refuses anything less,
+and treats a missing `Risk:` line as a risk. Without review tiers in `.agents/lifecycle.md`, leave both
+tier lines out: the spec is built as before. `Signed off:` is added in step 4.
 
 **`## Decisions` carries the rejected alternatives**, or the design gets relitigated in three months.
 A decision with no live alternative is not a decision; leave it out.
@@ -204,6 +214,30 @@ relevance, do not helpfully add it back.
 If `.agents/lifecycle.md` sets no budget, say so once and use the defaults in this document's own model
 table.
 <!-- shared:budget:end -->
+<!-- shared:review-budget:start source=review-budget.md -->
+**A review pass is a fixed number of agents, and the number of passes is fixed too.** Rounds after the
+first mostly return wording, not defects. `.agents/lifecycle.md` § *Reviewers* names the reviewers; the
+shape below holds whatever they are.
+
+| Phase | Agents | Passes |
+|---|---|---|
+| spec written | one `spec-reviewer` per lens, in one message | 1, and a second **only** if the first changed the design — then **one** agent over the changed sections |
+| plan written | 1 `change-reviewer`, every axis in one checklist | 1, no repeat |
+| risky task built | 1 `change-reviewer`, the *task review*, before the next task starts | 1 fix round, no re-review |
+| UI task built | 1 `change-reviewer`, the *screens review*, on that task's images | 1 fix round, no re-review |
+| last task built | the standing reviewers plus one per triggered conditional reviewer, in one message | 2 at most; the second needs a written reason and is scoped to the fix range and to the reviewers that found a `must` |
+
+**A task gets its own review only when the plan marks it `Risky: yes`:** it touches authentication,
+tenancy, permissions, a migration or a wire contract. Every other task is read by the end review.
+
+**One fix round per pass, by the session that wrote the code.** What it does not fix goes into the
+implementation record as a deferral, with the reason — never into another review round.
+
+**Never argue with a finding by sending another reviewer.** Settle it yourself, in the open.
+
+**Spending more than this is the user's call, never a quiet one of yours.** Say what another pass would
+look at and what it would cost, and let them ask.
+<!-- shared:review-budget:end -->
 
 ## Step 3 — Check it before anyone builds on it
 
@@ -234,17 +268,44 @@ the design. A spec that gained three decisions is worth re-reading; one that gai
 a further round still returns `question` findings, stop spawning reviewers, carry on with the user
 directly, and record what is still open under `## Open`.
 
-## Step 4 — Commit
+## Step 4 — The user signs it off
 
-One commit: `docs(specs): design <feature>`, per `.agents/naming.md`. Leave it uncommitted until step 3
-is done — what comes back usually changes it.
+After the cold read, before the commit. **A spec without a review tier skips this step**; show it the
+way step 5 says instead.
 
-Then put it in front of the user. They are about to be asked to agree with a document they have so far
-only seen as chat messages, so hand it to [`operator-view`](../../agents/operator-view.md) with the path
-— or, when the requirements are worth reading one at a time and annotating,
-[`show`](../show/SKILL.md) builds it as a page whose numbered lines they can comment on.
+- **Medium or heavy:** invoke [`show`](../show/SKILL.md), shape `walkthrough`, for
+  `spec-walkthrough.html` beside the spec, in the language `.agents/working-agreement.md` names (English
+  when it names none). Overview first, and as little prose as possible:
+  - what changes for the user
+  - how it is solved, to the depth a lead developer must understand
+  - what later work will copy
+  - the one-way doors, and what is left out
+  - the tier, and the clause that sets it
+  - every changed user flow as a UI mock
+- **Apply or answer every note, show the page again, and repeat until they sign it off with no note
+  open.** A note that changes the design is one more grilling round.
+- **Light:** one paragraph in the chat with what changes and why it is light. Their "fine" is the
+  sign-off.
+- **Then record it:** `node <skills>/_shared/tools/spec-gate.mjs sign <spec dir> --via walkthrough|chat`,
+  where `<skills>` is the parent of this skill's own directory. The fingerprint covers requirements,
+  criteria and decisions, so sign after the last edit to them.
 
-## Step 5 — Tell the board, if that is a standing write
+**Why a page and a signature:** the person who owns the change reads two pages — this one before the
+build, the review walkthrough after it — instead of every line of a spec and a diff. The fingerprint is
+what makes the first page binding: `/plan`, `/deliver` and `/advance` refuse a tiered spec whose signed
+sections changed since.
+
+## Step 5 — Commit
+
+One commit, with the walkthrough file when there is one: `docs(specs): design <feature>`, per
+`.agents/naming.md`. Leave it uncommitted until steps 3 and 4 are done — what comes back usually
+changes it.
+
+An untiered spec still gets put in front of the user: name the file, or, when the requirements are worth
+reading one at a time and annotating, [`show`](../show/SKILL.md) builds it as a page whose numbered lines
+they can comment on.
+
+## Step 6 — Tell the board, if that is a standing write
 
 <!-- shared:tracker-limits:start source=tracker-limits.md -->
 **Read the issue tracker freely. Write to it only as `.agents/tracker.md` allows** — at the repository
@@ -273,6 +334,10 @@ carry on with the local files.
 `--revise` rewrites an existing spec **in place, preserving every number**. New requirements append;
 removals become `~~withdrawn~~`. If it cannot preserve the numbering, it stops and says why.
 
+**An edit to requirements, criteria or decisions invalidates the sign-off.** Before the revision is
+committed, update the walkthrough, show it again and run step 4 once more. `/plan` and `/deliver` send a
+spec here when the spec gate refuses it.
+
 **A revision during implementation is a retrofit risk.** Weakening a requirement so the code passes
 turns a failed implementation into a passing one without anybody deciding to. So a revision says in the
 header **what changed and why** — and because the spec is committed, the diff backs that up.
@@ -288,14 +353,15 @@ satisfies, one that looks impossible, an attachment nobody could read. Then: `/p
 
 ## Language
 
-The spec is **English**. Chat may stay in the user's language.
+The spec is **English**. Chat may stay in the user's language. The walkthrough is in the language
+`.agents/working-agreement.md` names for walkthroughs — it is written for the person who signs it off.
 
 ## Dispatching the agents
 
 <!-- shared:agent-names:start source=agent-names.md -->
 **These agents ship inside this plugin, so their `subagent_type` carries the plugin prefix:**
 `lifecycle:code-scout`, `lifecycle:spec-reviewer`, `lifecycle:change-reviewer`,
-`lifecycle:ticket-implementer`, `lifecycle:finding-fixer`, `lifecycle:operator-view`.
+`lifecycle:finding-fixer`.
 
 A bare name may resolve, and it may also pick up a different agent the repo happens to define. **Pass
 the prefixed form.** Where this document links an agent by file, the prefixed name is what goes in the

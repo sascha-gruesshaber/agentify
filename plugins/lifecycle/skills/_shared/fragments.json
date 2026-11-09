@@ -1,5 +1,5 @@
 {
-  "$comment": "Read ONLY by tools/skills.mjs. A skill or agent listed under `requires` must carry that fragment's managed region; one listed under `forbids` must not. Paths are relative to the plugin root. A fragment no target requires is an orphan and fails `check` \u2014 a rule nobody applies is a rule that can be wrong without anybody finding out.",
+  "$comment": "Read ONLY by tools/skills.mjs. A skill or agent listed under `requires` must carry that fragment's managed region; one listed under `forbids` must not. Paths are relative to the plugin root. A fragment no target requires is an orphan and fails `check` — a rule nobody applies is a rule that can be wrong without anybody finding out.",
   "requires": {
     "skills/onboard/SKILL.md": [
       "edge-case-probe"
@@ -24,7 +24,8 @@
       "criterion-quality",
       "tracker-limits",
       "agent-names",
-      "budget"
+      "budget",
+      "review-budget"
     ],
     "skills/plan/SKILL.md": [
       "repo-config",
@@ -38,18 +39,8 @@
       "no-prejudging",
       "evidence-before-claims",
       "agent-names",
-      "budget"
-    ],
-    "skills/build/SKILL.md": [
-      "repo-config",
-      "worktree",
-      "file-handoff",
-      "model-choice",
-      "no-prejudging",
-      "gates",
-      "tracker-limits",
-      "agent-names",
-      "budget"
+      "budget",
+      "review-budget"
     ],
     "skills/tdd/SKILL.md": [
       "repo-config"
@@ -61,13 +52,6 @@
     "skills/resolve-conflicts/SKILL.md": [
       "gates",
       "evidence-before-claims"
-    ],
-    "agents/ticket-implementer.md": [
-      "repo-config",
-      "agent-report-contract",
-      "evidence-before-claims",
-      "gates",
-      "uncertainty-signal"
     ],
     "agents/finding-fixer.md": [
       "repo-config",
@@ -93,8 +77,24 @@
       "agent-report-contract",
       "uncertainty-signal"
     ],
-    "skills/show/SKILL.md": [
-      "agent-names"
+    "skills/deliver/SKILL.md": [
+      "repo-config",
+      "worktree",
+      "file-handoff",
+      "model-choice",
+      "no-prejudging",
+      "gates",
+      "tracker-limits",
+      "agent-names",
+      "budget",
+      "review-budget"
+    ],
+    "skills/ship/SKILL.md": [
+      "repo-config",
+      "tracker-limits"
+    ],
+    "skills/babysit/SKILL.md": [
+      "repo-config"
     ]
   },
   "forbids": {
@@ -128,7 +128,8 @@
     ],
     "skills/show/SKILL.md": [
       "gates",
-      "tracker-limits"
+      "tracker-limits",
+      "agent-names"
     ]
   }
 }

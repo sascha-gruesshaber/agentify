@@ -1,95 +1,84 @@
-# Picking tiers and lenses for the plan you are actually on
+# Picking tiers and reviewers for the plan you are actually on
 
 Read this with `/onboard` question 6. It turns "how much may one call cost" into four ready-made
 profiles, because the honest answer depends on something the repo cannot tell you: **which subscription
 is paying for the run.**
 
-> **This is calibrated on one project, not a benchmark.** The numbers below come from a .NET monorepo of
-> roughly 12 services and 3 front ends, where this lifecycle was used daily for months. Treat the
-> *shape* as advice and the numbers as a starting point. **Plan names and prices change** — check current
-> pricing rather than trusting the figures here; the profile is the durable part.
+> **This is calibrated on one project, not a benchmark.** The numbers below come from a monorepo of
+> roughly a dozen services and three front ends, where this lifecycle built several hundred tasks. Treat
+> the *shape* as advice and the numbers as a starting point. **Plan names and prices change** — check
+> current pricing rather than trusting the figures here; the profile is the durable part.
 
 ## First, what actually burns the budget
 
-Three things, and the order surprises people:
-
-1. **Wave width, more than anything else.** A wave of three tickets is three full
-   implement → review → fix cycles running *at once*. It does not just cost three times as much in
-   total — it burns three times as fast, against a rolling window. **This is the single biggest lever on
-   whether you hit a limit.**
-2. **The lens count.** Six sweep lenses cost three times two. Each is a whole agent reading a whole diff.
+1. **The number of agents.** Every agent pays a fixed start-up cost — on the order of 15–20k tokens —
+   before it reads a line. Eight reviewers reading the same diff pay it eight times. **This is the
+   single biggest lever**, and why `/deliver` groups lenses into a few reviewers and builds in the session
+   instead of handing tasks to implementer agents.
+2. **The session's own length.** `/deliver` builds every task in one session; a long plan is a long
+   session. Compaction carries it, and the plan's `## Build` checklist is what makes a fresh session
+   resume cheaply.
 3. **The tier.** Real, but third — and see the trap below before you reach for it.
 
-## The trap: cut scope before you cut tier
+## The trap: cut agents before you cut tier
 
 **A cheap model on hard work often costs more than an expensive one.** It takes two or three times the
-turns, fails its gates, gets re-dispatched, and you pay for every attempt. This is already the law in
-`model-choice`, and it is exactly where a tight budget goes wrong:
-
-> Downgrading a **design-carrying** slice to save money is the most reliable way to spend more.
+turns, misses what it was sent to find, and you pay for the miss later. A reviewer on a cheaper tier that
+returns `clean` on a real defect is the most expensive review there is.
 
 So when the budget is tight, in this order:
 
-1. **Narrow the work.** Wave width to 1. Fewer, smaller tickets.
-2. **Drop lenses**, using the cut order below.
-3. **Lower the tier — but only on the mechanical slices**, where the brief already contains the shape.
-4. **Only then** consider the tier on design-carrying work, and expect it to disappoint.
+1. **Fewer reviewers.** Merge lenses into the standing reviewers; drop conditional ones by the cut order.
+2. **Fewer task reviews.** Mark only what truly touches auth, tenancy, permissions, a migration or a wire
+   contract as `Risky: yes`.
+3. **Only then** a cheaper tier for a reviewer, and expect it to miss things.
 
 ## The four profiles
 
 ### Pro — roughly €20/month
 
-Real constraint. Assume Opus is scarce or unavailable, and plan for it rather than discovering it
-mid-wave.
+Real constraint. Assume the most capable tier is scarce, and plan for it rather than discovering it
+mid-run.
 
 | Setting | Value |
 |---|---|
-| wave width | **1** — no parallelism at all |
 | spec cold reads | **1 lens: implementability** |
-| plan-check | **keep it**, sonnet, all eight axes |
-| per-ticket review | **keep it** — one ticket-review lens |
-| sweep lenses | **2: correctness, spec alignment** |
-| fix rounds per ticket | **1** |
-| implementation | sonnet; escalate one slice at a time only if it stalls twice |
-| sweep fix | sonnet |
+| plan-check | **keep it** — one reviewer, all eight axes, sonnet |
+| task review (risky tasks) | **keep it**, sonnet |
+| screens review | only for a heavy tier |
+| end review | **2 reviewers: correctness · spec alignment** |
+| fix rounds | 1 per pass, 1 pass |
 
 **Also worth doing on Pro:** take the fast path more often. `/frame` offers it, and a change that
 genuinely does not need a contract should not get one.
 
 ### Max 5× — roughly €100/month
 
-**This is the measured working point.** Mostly Opus, **one or two tickets at a time**, comfortably
-within the window for a full working day.
+**The measured working point.** One feature at a time, a full working day within the window.
 
 | Setting | Value |
 |---|---|
-| wave width | **1–2** |
 | spec cold reads | all 4 |
-| plan-check | all 8 axes, sonnet |
-| per-ticket review | 1 ticket-review lens, sonnet |
-| sweep lenses | 5, sonnet |
-| fix rounds per ticket | 3 |
-| implementation | opus on design-carrying, sonnet on mechanical |
-| sweep fix | opus |
-
-**Going to three tickets in a wave is where this plan stops being enough.** That was the observed edge,
-and it is the first thing to pull back if you start hitting limits.
+| plan-check | one reviewer, all 8 axes, opus |
+| task review (risky tasks) | opus |
+| screens review | every UI task |
+| end review | the 3 standing reviewers, conditional ones on their trigger, opus |
+| fix rounds | 1 per pass, 2 passes at most |
 
 ### Max 20× — roughly €200/month
 
-Headroom for the full shape.
+Headroom for the full shape, and for two features in two worktrees at once.
 
 | Setting | Value |
 |---|---|
-| wave width | **3** |
 | spec cold reads | all 4, opus on implementability and scope |
-| plan-check | all 8, opus on coverage and risk |
-| sweep lenses | 5–7, and escalate a lens on a diff you distrust |
-| fix rounds per ticket | 3 |
-| implementation | opus by default |
+| plan-check | one reviewer, all 8 axes, opus |
+| task review, screens review | as Max 5× |
+| end review | standing + conditional reviewers, opus; the most capable tier on a diff you distrust |
+| fix rounds | 1 per pass, 2 passes at most |
 
-**Above three, the binding limit stops being the plan and becomes you.** Wave width is bounded by how
-many agent reports one orchestrator can triage well — go wider and the reports get skimmed, which is the
+**Above two features at once, the binding limit stops being the plan and becomes you.** Every finished
+feature ends at a walkthrough a person reads; more in flight means walkthroughs get skimmed, which is the
 failure the reviews existed to prevent.
 
 ### API or console billing
@@ -107,12 +96,12 @@ thorough it feels:
 |---|---|
 | 1 · **implementability**, on the spec | One call, and it can prevent a whole wrong build. Best ratio in the kit. |
 | 2 · **plan-check's claims axis** | Greps and file opens. Cheap, and it stops work being built on fiction. |
-| 3 · **the per-ticket review** | Catches a missed acceptance criterion while the context is still warm and the fix is one round. |
-| 4 · **correctness**, in the sweep | Finds real bugs, with a repro attached. |
-| 5 · **spec alignment**, in the sweep | Catches drift across tickets that no per-ticket review can see. |
+| 3 · **correctness**, in the end review | Finds real bugs, with a repro attached. |
+| 4 · **spec alignment**, in the end review | Catches what the build drifted from, which nobody inside the session can see. |
+| 5 · **the task review** on a risky task | Catches an auth or contract mistake before later tasks build on it. |
 | — | *cut from here down first* |
-| 6 · test gaps | Real value, but a coverage gate catches much of it. |
-| 7 · over-engineering | Cheap to fix later; nothing breaks meanwhile. |
+| 6 · the screens review | Real value on a new screen; a person still looks at the walkthrough. |
+| 7 · test gaps, over-engineering, adjacent | Cheap to fix later; nothing breaks meanwhile. |
 | 8 · repo standards | Largely what a linter and a formatter already enforce. |
 | 9 · docs completeness | The most deferrable. Costs nothing today and something in six months. |
 
@@ -121,11 +110,9 @@ one, and cutting them is how a tight budget becomes an expensive rebuild.
 
 ## When you hit a limit mid-run
 
-It will happen inside a wave, because that is when burn is highest.
-
-- **Finish the ticket that is in flight.** A half-built ticket in a worktree is the most expensive thing
-  to come back to.
-- **Integrate what is green**, and update the ledger and the spec header. `/lifecycle:advance` picks it
-  up from disk later — that is what the committed state is for.
-- **Then narrow and resume**: wave width 1, and the cut order above.
-- **Do not** re-dispatch the same wave on a cheaper tier and hope. That pays twice for one result.
+- **Finish and commit the task in flight**, with its `## Build` line checked. A half-built task is the
+  most expensive thing to come back to.
+- **Stop there.** `/lifecycle:advance` picks the run up from disk later, at the first unchecked line —
+  that is what the checklist is for.
+- **Then cut by the order above and resume.** Do not re-run the same review on a cheaper tier and hope;
+  that pays twice for one result.

@@ -24,6 +24,10 @@ jobs:
         working-directory: plugins/lifecycle
         run: node --test "skills/_shared/tools/skills.test.mjs"
 
+      - name: spec gate and page check tests
+        working-directory: plugins/lifecycle
+        run: node --test "skills/_shared/tools/spec-gate.test.mjs" "skills/show/check-page.test.mjs"
+
       - name: every manifest parses
         run: |
           for f in .claude-plugin/marketplace.json plugins/*/.claude-plugin/plugin.json; do
@@ -83,7 +87,7 @@ jobs:
           '
 
       # The whole plugin exists because upstream skills carry this flag: it makes a skill
-      # un-invokable by the model, so /advance and /build stall and ask the user to type the next
+      # un-invokable by the model, so /advance and /deliver stall and ask the user to type the next
       # step. One line here protects the composition the lifecycle is built on.
       - name: no skill blocks model invocation
         run: |

@@ -7,8 +7,8 @@ description: Adversarially review an implementation plan before anyone builds it
 
 Review a plan **before it is built**, the way a code review works after.
 
-> **A plan is the only artefact in the flow with no independent review.** Code gets a per-ticket pass
-> and a whole-feature sweep; the plan every one of them is measured against was written once, by one
+> **A plan is the only artefact in the flow with no independent review.** Code gets a review after each
+> risky task and fresh reviewers over the whole diff; the plan every one of them is measured against was written once, by one
 > model, and read once by a human seeing it for the first time. That is backwards. A wrong plan is the
 > cheapest thing here to fix and the most expensive to miss, because everything after it is built
 > correctly on top of the mistake.
@@ -23,13 +23,14 @@ and treat them as authority over anything you would otherwise assume.**
 
 | File | Answers |
 |---|---|
-| `.agents/lifecycle.md` | which phases run, which review lenses are in use, how many rounds each loop gets, how wide a wave may be |
+| `.agents/lifecycle.md` | which phases run, the review tiers, which reviewers and lenses are in use, how many rounds each loop gets |
 | `.agents/gates.md` | the commands that must pass, in order, and what "green" means here |
-| `.agents/tracker.md` | where specs and tickets live, and what may be written to the board |
-| `.agents/forge.md` | the git host, and how a branch becomes a reviewed change |
+| `.agents/tracker.md` | where specs live, and what may be written to the board |
+| `.agents/forge.md` | the git host, the ship mode, and how a branch becomes a reviewed change |
+| `.agents/preview.md` | how to bring the app up, seed a scenario and screenshot a screen, and where the design reference lives |
 | `.agents/docs.md` | where architecture truth lives, the glossary, and what "docs are part of done" costs |
 | `.agents/naming.md` | branch, commit, directory and test-name grammar |
-| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, when to stop and ask |
+| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, the walkthrough language, when to stop and ask |
 
 Three rules:
 
@@ -43,7 +44,7 @@ Three rules:
 
 ## When NOT to use
 
-- To review code that exists → the review lenses in [`build`](../build/SKILL.md).
+- To review code that exists → the review catalogue in [`deliver`](../deliver/SKILL.md).
 - On a change too small to have had a plan.
 - To settle an open design question the plan rests on → [`grill`](../grill/SKILL.md) first. A plan
   review cannot tell you what the user wanted.
@@ -53,13 +54,15 @@ Three rules:
 The plan and **the spec it argues from**. The spec is the binding authority; the plan is its argument.
 Where they disagree, the spec wins and the disagreement is a finding.
 
-## Step 2 — Send the lenses
+## Step 2 — Send one reviewer with every axis
 
-Spawn [`change-reviewer`](../../agents/change-reviewer.md) once per axis below, **all in one message**,
-each on `sonnet` unless the plan touches auth, tenancy, migrations, permissions or a wire contract —
-then the coverage and risk axes go to `opus`.
+Spawn **one** [`change-reviewer`](../../agents/change-reviewer.md) with all eight axes below as one
+checklist, and the plan path and the spec path. **Never paste either into the prompt.** Eight agents
+reading the same two documents pay the start-up cost eight times for the same read; one agent with a
+checklist finds the same things.
 
-Hand each one the plan path and the spec path. **Never paste either into the prompt.**
+Ask it to label every finding with its axis, and to put the claims table first: checking claims against
+the repository is the axis this skill exists for.
 
 <!-- shared:no-prejudging:start source=no-prejudging.md -->
 **Never tell a reviewer what not to flag.** If the prompt you are writing contains "do not flag", "don't
@@ -72,8 +75,8 @@ Two rules that follow:
 
 - **Do not add open-ended directives** — "check all uses", "run the race tests if useful" — without a
   concrete, task-specific reason. They cost a reviewer's whole budget and return nothing.
-- **Do not ask a reviewer to re-run tests the implementer already ran on the same code.** The
-  implementer's report carries that evidence.
+- **Do not ask a reviewer to re-run the gates the session already ran on the same commit.** The
+  commit is gated; a reviewer reads, it does not rebuild.
 
 **Triage is the caller's job, not the reviewer's.** A reviewer that filters while it looks leaves buckets
 empty for the wrong reason: cover first, filter second, and judge severity as a separate pass over a list
@@ -116,6 +119,30 @@ relevance, do not helpfully add it back.
 If `.agents/lifecycle.md` sets no budget, say so once and use the defaults in this document's own model
 table.
 <!-- shared:budget:end -->
+<!-- shared:review-budget:start source=review-budget.md -->
+**A review pass is a fixed number of agents, and the number of passes is fixed too.** Rounds after the
+first mostly return wording, not defects. `.agents/lifecycle.md` § *Reviewers* names the reviewers; the
+shape below holds whatever they are.
+
+| Phase | Agents | Passes |
+|---|---|---|
+| spec written | one `spec-reviewer` per lens, in one message | 1, and a second **only** if the first changed the design — then **one** agent over the changed sections |
+| plan written | 1 `change-reviewer`, every axis in one checklist | 1, no repeat |
+| risky task built | 1 `change-reviewer`, the *task review*, before the next task starts | 1 fix round, no re-review |
+| UI task built | 1 `change-reviewer`, the *screens review*, on that task's images | 1 fix round, no re-review |
+| last task built | the standing reviewers plus one per triggered conditional reviewer, in one message | 2 at most; the second needs a written reason and is scoped to the fix range and to the reviewers that found a `must` |
+
+**A task gets its own review only when the plan marks it `Risky: yes`:** it touches authentication,
+tenancy, permissions, a migration or a wire contract. Every other task is read by the end review.
+
+**One fix round per pass, by the session that wrote the code.** What it does not fix goes into the
+implementation record as a deferral, with the reason — never into another review round.
+
+**Never argue with a finding by sending another reviewer.** Settle it yourself, in the open.
+
+**Spending more than this is the user's call, never a quiet one of yours.** Say what another pass would
+look at and what it would cost, and let them ask.
+<!-- shared:review-budget:end -->
 
 ## The eight axes
 
@@ -141,11 +168,13 @@ table.
    written, with no machine-specific path and no credential that will not exist elsewhere.
 
 5. **Sequencing and interfaces.** Task N can run once N−1 is done, and each task leaves the tree
-   building. **Cross-check every `Consumes` against the matching `Produces`** — a name or a type that
+   building. **`## Build` lists every task in order, a review line after every task marked `Risky: yes`
+   and a screens line after every task with `Screens:`, and ends with the end review.** **Cross-check every `Consumes` against the matching `Produces`** — a name or a type that
    does not line up is the conflict that shows up at integration, and it is free to find here.
 
 6. **Risk and blast radius.** Migrations, permissions and tenancy, public contracts, message schemas,
-   deploy ordering, backward compatibility. Ask what happens if this ships half-applied, because sooner
+   deploy ordering, backward compatibility. **A task that touches any of these and says `Risky: no` is a
+   blocking finding.** Ask what happens if this ships half-applied, because sooner
    or later something will.
 
 7. **Testability.** The tests the plan names actually observe the behaviour, at a seam that exists or
@@ -159,7 +188,7 @@ table.
 
 ## Step 3 — The conflict table
 
-Separately from the lenses, build one table yourself. It is cheap and it catches what per-axis review
+While the reviewer runs, build one table yourself. It is cheap and it catches what a checklist read
 cannot see.
 
 - **One row for every pair of tasks that share a file or an interface** — the two tasks, what one
@@ -202,7 +231,7 @@ Write `plan-check.md` beside the plan and commit it with the plan.
 **Date:** YYYY-MM-DD
 **Plan:** `<path to plan.md>`
 **Verdict:** Ready to build | Ready with changes | Not ready
-**Lenses:** coverage, claims, conventions, executability, sequencing, risk, testability, scope
+**Axes:** coverage, claims, conventions, executability, sequencing, risk, testability, scope
 **Claims checked:** <n> confirmed · <n> contradicted · <n> could not verify
 
 ## Blocking
@@ -228,7 +257,7 @@ Write `plan-check.md` beside the plan and commit it with the plan.
 **A finding cites a task heading, not a `file:line`.** The code does not exist yet.
 
 **A reviewer that verified nothing is a failed reviewer**, however well written its report. Checking
-claims against the repository is the axis this skill exists for; a lens that returned reasoning instead
+claims against the repository is the axis this skill exists for; an axis that returned reasoning instead
 of evidence contributed neither. Say so in the report rather than counting it.
 
 **A contradicted claim is never a wording fix.** The plan asserted something false, so the reasoning
@@ -237,7 +266,7 @@ resting on it has not been done — that area gets re-scouted, not re-worded.
 ## Chat summary
 
 The verdict in the first line. Then the blocking count, the claim counts, and the single most expensive
-thing found. Then: `/build` on Ready, `/plan` again on Not ready.
+thing found. Then: `/deliver` on Ready, `/plan` again on Not ready.
 
 **The re-plan cap is in `.agents/lifecycle.md`** — typically one, then get a person. A plan that fails
 twice has something wrong with its premises, and a re-plan loop is unusually cheap to get stuck in.
@@ -247,7 +276,7 @@ twice has something wrong with its premises, and a re-plan loop is unusually che
 <!-- shared:agent-names:start source=agent-names.md -->
 **These agents ship inside this plugin, so their `subagent_type` carries the plugin prefix:**
 `lifecycle:code-scout`, `lifecycle:spec-reviewer`, `lifecycle:change-reviewer`,
-`lifecycle:ticket-implementer`, `lifecycle:finding-fixer`, `lifecycle:operator-view`.
+`lifecycle:finding-fixer`.
 
 A bare name may resolve, and it may also pick up a different agent the repo happens to define. **Pass
 the prefixed form.** Where this document links an agent by file, the prefixed name is what goes in the

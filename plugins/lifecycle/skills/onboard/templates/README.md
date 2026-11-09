@@ -8,13 +8,14 @@ They are also readable by a human in five minutes, which is the other reason the
 
 | File | Answers |
 |---|---|
-| [`lifecycle.md`](lifecycle.md) | which phases run, which review lenses, how many rounds, how wide a wave |
+| [`lifecycle.md`](lifecycle.md) | which phases run, the review tiers, which reviewers and lenses, how many rounds |
 | [`gates.md`](gates.md) | the commands that must pass, in order, and what "green" means here |
-| [`tracker.md`](tracker.md) | where specs and tickets live, and what may be written to the board |
-| [`forge.md`](forge.md) | the git host, and how a branch becomes a reviewed change |
+| [`tracker.md`](tracker.md) | where specs live, and what may be written to the board |
+| [`forge.md`](forge.md) | the git host, the ship mode, and how a branch becomes a reviewed change |
+| [`preview.md`](preview.md) | how to bring the app up, seed a scenario, screenshot a screen, and where designs live |
 | [`docs.md`](docs.md) | where architecture truth lives, the glossary, what "docs are part of done" costs |
 | [`naming.md`](naming.md) | branch, commit, directory and test-name grammar |
-| [`working-agreement.md`](working-agreement.md) | hours, unattended work, the autonomy line, how to report |
+| [`working-agreement.md`](working-agreement.md) | hours, unattended work, the autonomy line, how to report, the walkthrough language |
 
 ## Rules for editing these
 

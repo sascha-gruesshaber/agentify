@@ -27,13 +27,16 @@ and no upgrade path** — refreshing means re-reading a source and deciding agai
 | Unrequested behaviour is a defect in its own right | a big private  .NET repo | `change-reviewer` |
 | **Shared rule files injected as managed regions, with a checker** | a big private  .NET repo | `skills/_shared/`, `tools/skills.mjs` |
 | The checker needs a negative control, or there is no evidence it can fail | a big private  .NET repo | `tools/skills.test.mjs` |
-| A ledger naming its own spec on line 1, so a compacted run resumes | superpowers | `build` step 1 |
-| Hand briefs and diffs over as file paths; the agent returns a status line | superpowers | `fragments/file-handoff.md` |
+| The plan's `## Build` checklist as the run's progress, so a compacted run resumes at the first unchecked line | a big private  .NET repo | `plan` step 6, `deliver` step 4 |
+| The session builds; fresh agents only review — measured: hand-overs cost more than the code | a big private  .NET repo | `deliver` |
+| Review tiers, a signed-off spec walkthrough with a fingerprint, a review walkthrough at the end | a big private  .NET repo | `spec`, `deliver`, `show`, `tools/spec-gate.mjs` |
+| Screenshot each UI task before and after, and have a fresh reviewer read the images | a big private  .NET repo | `deliver`, `.agents/preview.md` |
+| A fixed review budget per phase; group lenses into few reviewers | a big private  .NET repo | `fragments/review-budget.md`, `deliver/prompts.md` |
+| Hand briefs and diffs over as file paths and pinned ranges | superpowers | `fragments/file-handoff.md` |
 | Four agent statuses, each with a written handler | superpowers | `fragments/agent-report-contract.md` |
-| Fix round one resumes the agent that wrote the code | superpowers | `build` step 4 |
 | Never tell a reviewer what not to flag, with the tell-phrases listed | superpowers | `fragments/no-prejudging.md` |
 | Evidence before claims — the command, run in this message | superpowers | `fragments/evidence-before-claims.md` |
-| `Consumes` / `Produces` on every task, so parallel work agrees on names | superpowers | `plan` step 6 |
+| `Consumes` / `Produces` on every task, so later tasks agree on names after a compaction | superpowers | `plan` step 6 |
 | Three paths, and the ratchet only goes up | superpowers | `frame` step 3 |
 | The design tree and its frontier, asked a whole round at a time | mattpocock | `grill` |
 | The red-green loop, the three test anti-patterns, mock only at boundaries | mattpocock | `tdd` |
@@ -50,15 +53,16 @@ in six months.
 | Idea | From | Why not |
 |---|---|---|
 | Specs, plans and reports in a gitignored scratch directory | a big private  .NET repo | Their own docs list the cost: per-machine, unshareable, **no history** — so their own "was the spec weakened to fit the code?" check cannot run at all. Ours are committed and move through review. |
-| A 1,593-line orchestrator prompt | a big private  .NET repo | A fixed context cost on every turn of a long run. `build` does most of the same job in a fraction of it. |
+| A 1,593-line orchestrator prompt | a big private  .NET repo | A fixed context cost on every turn of a long run. `deliver` does most of the same job in a fraction of it. |
 | The incident behind each rule, inline with the rule | a big private  .NET repo | Excellent as a record, expensive as a prompt. A fragment states the law; commit messages hold the reasoning. |
 | A multi-model review panel resolved from a rigor matrix | a big private  .NET repo | Built for a 28-repository estate with a second model family available. **Revisit if a second engine is ever in play.** |
 | **Two agent definitions per role, to move the effort axis** | a big private  .NET repo | A workaround for the `Agent` tool having no effort parameter. Costs a byte-identical duplicate of every role plus a check to police it. `.agents/lifecycle.md` records the intent instead, and says so plainly. |
 | Plans that inline the code for every step | superpowers | Goes stale the moment the repo moves, and the implementer writes it better than the planner guesses it. A task names behaviour, file, seam and verify command. |
-| Never run implementers in parallel | superpowers | They forbid it because of conflicts. **A worktree per ticket removes the conflict**, so waves run up to three. |
+| Implementer agents per ticket, in parallel waves | an earlier version of this plugin | **Removed.** Measured on the source repo, the implementers' orientation, the lead's integration and the fixers' re-reading cost more than the code, and a review per ticket did not reduce what the end review found. The session builds serially instead. |
+| Reviews in separate harness threads or a workflow engine | an earlier version of the source repo | Ties the lifecycle to one harness. A reviewer is a subagent the session sends; that works anywhere subagents do. |
 | A local companion server for live visual feedback | superpowers | Artifacts plus paste-back first. This is the **named upgrade** when paste-back grates — MIT, zero dependencies. `show` says so at the bottom. |
 | A 0–5 scorecard over the estate | a big private  .NET repo | They built it, ran it, and **deleted it**: a number gets quoted without the evidence behind it. Do not rebuild it. |
-| Baking the forge into the build orchestrator | — | Review mechanics differ per host and per team more than anything else in the flow. `build` stops at a green branch on purpose. |
+| Baking the forge into the build orchestrator | — | Review mechanics differ per host and per team more than anything else in the flow. `deliver` hands the forge half to `ship` and `babysit`, which run only the commands `.agents/forge.md` names, and only as far as its ship mode allows. |
 
 ## The fact that caused all of it
 
