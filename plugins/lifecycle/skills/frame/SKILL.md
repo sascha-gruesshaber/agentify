@@ -25,13 +25,14 @@ and treat them as authority over anything you would otherwise assume.**
 
 | File | Answers |
 |---|---|
-| `.agents/lifecycle.md` | which phases run, which review lenses are in use, how many rounds each loop gets, how wide a wave may be |
+| `.agents/lifecycle.md` | which phases run, the review tiers, which reviewers and lenses are in use, how many rounds each loop gets |
 | `.agents/gates.md` | the commands that must pass, in order, and what "green" means here |
-| `.agents/tracker.md` | where specs and tickets live, and what may be written to the board |
-| `.agents/forge.md` | the git host, and how a branch becomes a reviewed change |
+| `.agents/tracker.md` | where specs live, and what may be written to the board |
+| `.agents/forge.md` | the git host, the ship mode, and how a branch becomes a reviewed change |
+| `.agents/preview.md` | how to bring the app up, seed a scenario and screenshot a screen, and where the design reference lives |
 | `.agents/docs.md` | where architecture truth lives, the glossary, and what "docs are part of done" costs |
 | `.agents/naming.md` | branch, commit, directory and test-name grammar |
-| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, when to stop and ask |
+| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, the walkthrough language, when to stop and ask |
 
 Three rules:
 
@@ -87,6 +88,12 @@ Say the classification in one line so it can be overridden. The fast-path rule i
 **A change that needs "and" to describe takes the full path. The ratchet is one way.** Hidden
 complexity found later upgrades the path — stop and say so. Nothing downgrades mid-flight, and
 reaching for a lighter label to skip work *is* the doubt that means you should take the heavier one.
+
+**Propose the review tier and the risk of a full-path change**, when `.agents/lifecycle.md` § *Review
+tiers* uses them: light, medium or heavy, by the definitions written there, and the risk in one clause
+or `none`. A spike or the fast path has neither. The tier decides what the user reads later — a chat
+summary, or a walkthrough before the build and another after it — so name the clause that sets it.
+**Heavy wins**: a change that meets heavy's definition is heavy, even when it also meets light's.
 
 ## Step 4 — Sweep the edge cases
 
@@ -149,6 +156,8 @@ Four blocks, in the chat, nothing written to disk:
 
 ```
 **Path:** full · <one clause of why>
+**Review tier:** light | medium | heavy · <the clause that sets it>   — omit the line for a spike, the fast path, or a repo without tiers
+**Risk:** none | <what could go wrong in production>
 **Source:** <KEY> (+ 3 comments, 1 linked issue) | the conversation
 
 **What is true today**
@@ -179,7 +188,7 @@ assumptions. Skipping the round trip never skips the edge-case capture.
 <!-- shared:agent-names:start source=agent-names.md -->
 **These agents ship inside this plugin, so their `subagent_type` carries the plugin prefix:**
 `lifecycle:code-scout`, `lifecycle:spec-reviewer`, `lifecycle:change-reviewer`,
-`lifecycle:ticket-implementer`, `lifecycle:finding-fixer`, `lifecycle:operator-view`.
+`lifecycle:finding-fixer`.
 
 A bare name may resolve, and it may also pick up a different agent the repo happens to define. **Pass
 the prefixed form.** Where this document links an agent by file, the prefixed name is what goes in the

@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: The red-green loop, and what makes a test worth keeping — one test, one implementation, repeat, at seams that were agreed before any test was written. Use when building a feature or fixing a bug test-first, when someone says "red-green-refactor" or "write the test first", and by `ticket-implementer` on every ticket. Keywords - tdd, test first, red green, write the test first, failing test, seam, tautological test, what should I test.
+description: The red-green loop, and what makes a test worth keeping — one test, one implementation, repeat, at seams that were agreed before any test was written. Use when building a feature or fixing a bug test-first, when someone says "red-green-refactor" or "write the test first", and by `/deliver` on every plan task. Keywords - tdd, test first, red green, write the test first, failing test, seam, tautological test, what should I test.
 ---
 
 # Test-driven development
@@ -13,13 +13,14 @@ and treat them as authority over anything you would otherwise assume.**
 
 | File | Answers |
 |---|---|
-| `.agents/lifecycle.md` | which phases run, which review lenses are in use, how many rounds each loop gets, how wide a wave may be |
+| `.agents/lifecycle.md` | which phases run, the review tiers, which reviewers and lenses are in use, how many rounds each loop gets |
 | `.agents/gates.md` | the commands that must pass, in order, and what "green" means here |
-| `.agents/tracker.md` | where specs and tickets live, and what may be written to the board |
-| `.agents/forge.md` | the git host, and how a branch becomes a reviewed change |
+| `.agents/tracker.md` | where specs live, and what may be written to the board |
+| `.agents/forge.md` | the git host, the ship mode, and how a branch becomes a reviewed change |
+| `.agents/preview.md` | how to bring the app up, seed a scenario and screenshot a screen, and where the design reference lives |
 | `.agents/docs.md` | where architecture truth lives, the glossary, and what "docs are part of done" costs |
 | `.agents/naming.md` | branch, commit, directory and test-name grammar |
-| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, when to stop and ask |
+| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, the walkthrough language, when to stop and ask |
 
 Three rules:
 
@@ -46,7 +47,7 @@ A **seam** is the public boundary you observe behaviour at without reaching insi
 never against internals.
 
 **Test only at agreed seams.** They are named in [`plan.md`](../plan/SKILL.md) before any code is
-written, and the ticket carries them. **Do not invent one mid-test.** A seam chosen while writing the
+written, and the plan task carries them. **Do not invent one mid-test.** A seam chosen while writing the
 test is chosen to make that test easy, which is how a suite ends up pinned to the implementation it was
 meant to be independent of.
 
@@ -67,7 +68,7 @@ trivialise the assertion, either promote the test or rename it to match what it 
   tests and then all the code — bulk tests verify *imagined* behaviour and pin the shape of things
   rather than what a caller does.
 - **Refactoring is not part of the loop.** It belongs to review.
-- **Do not anticipate.** No speculative feature, no test for a case the ticket did not ask for.
+- **Do not anticipate.** No speculative feature, no test for a case the task did not ask for.
 
 ## What a good test is
 
@@ -135,7 +136,7 @@ directly in code under test.
 
 The floor and the tool that measures it are in `.agents/gates.md`.
 
-Working test-first covers the paths the ticket is about. **Then walk your own diff** for the code around
+Working test-first covers the paths the task is about. **Then walk your own diff** for the code around
 them — a guard clause, an error path, an extracted helper — and report any added line no test executes.
 **You never reach the floor by widening an exclusion or by writing a test that passes by construction.**
 

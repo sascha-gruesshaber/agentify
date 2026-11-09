@@ -214,7 +214,7 @@
 
   function tray() {
     if (armed !== null) disarmClear();
-    var n = Object.keys(notes).length;
+    var n = order.filter((o) => notes[o.id]).length; // only blocks still on the page; a dropped block's note stays out
     var plural = n === 1 ? "" : "s";
     countEl.innerHTML = n === 0
       ? "No notes yet — click any box to add one."

@@ -1,6 +1,15 @@
 # Forge — how a branch becomes a reviewed change
 
-`/build` stops at a **green feature branch**. Everything below that line is this repo's own business.
+How a built branch becomes a reviewed change here, and how far `/deliver` takes it on its own.
+
+## Ship mode
+
+**Ship mode:** review
+
+**Why:** `gh` is installed and authenticated with the `repo` scope, and CI runs on every pull request. But
+nothing blocks a merge and there is one maintainer, so the agent opens the pull request and the
+maintainer reads and merges it. `review+watch` is not taken: there are no reviewers whose comments need
+tending. `/babysit` still works when asked by name.
 
 ## The host
 
@@ -15,7 +24,9 @@
 
 ```bash
 git push -u origin <branch>
-gh pr create --base main --title "<type>(<scope>): <what the change achieves>" --body "<body>"
+gh pr create --base main --title "<type>(<scope>): <what the change achieves>" --body-file <file>
+gh pr list --head <branch> --state open          # the open pull request for a branch
+gh pr edit <n> --body-file <file>                # rewrite a description
 ```
 
 - **Target:** `main`
@@ -26,6 +37,7 @@ gh pr create --base main --title "<type>(<scope>): <what the change achieves>" -
   verification claims you can make** — CI green, or CI green plus a reinstalled behaviour run. See
   [`gates.md`](gates.md) § *The trap that matters more than any of the above*.
 - **Draft first?** No. CI runs on every pull request, so a normal pull request already gets the gate.
+- **Agent marker:** a comment an agent writes starts with `🤖`. `/babysit` skips its own comments by it.
 
 ## Reading review comments
 
@@ -64,6 +76,10 @@ rule it enforces — read the step name before reading your own diff.
 **So the gate is a habit, not a wall.** Treat a red `ci` run as blocking anyway and say so out loud;
 the machine will not say it for you. This is the single largest gap between how this repo is set up and
 how the lifecycle assumes a repo is set up.
+
+## Approving and merging
+
+**NOT CONFIGURED: the maintainer merges.** No agent approves or merges a pull request here.
 
 ## What is deliberately not automated here
 

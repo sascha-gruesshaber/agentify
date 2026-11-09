@@ -19,13 +19,14 @@ and treat them as authority over anything you would otherwise assume.**
 
 | File | Answers |
 |---|---|
-| `.agents/lifecycle.md` | which phases run, which review lenses are in use, how many rounds each loop gets, how wide a wave may be |
+| `.agents/lifecycle.md` | which phases run, the review tiers, which reviewers and lenses are in use, how many rounds each loop gets |
 | `.agents/gates.md` | the commands that must pass, in order, and what "green" means here |
-| `.agents/tracker.md` | where specs and tickets live, and what may be written to the board |
-| `.agents/forge.md` | the git host, and how a branch becomes a reviewed change |
+| `.agents/tracker.md` | where specs live, and what may be written to the board |
+| `.agents/forge.md` | the git host, the ship mode, and how a branch becomes a reviewed change |
+| `.agents/preview.md` | how to bring the app up, seed a scenario and screenshot a screen, and where the design reference lives |
 | `.agents/docs.md` | where architecture truth lives, the glossary, and what "docs are part of done" costs |
 | `.agents/naming.md` | branch, commit, directory and test-name grammar |
-| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, when to stop and ask |
+| `.agents/working-agreement.md` | working hours, what may run unattended, how to report, the walkthrough language, when to stop and ask |
 
 Three rules:
 
@@ -76,7 +77,7 @@ that is really a preference costs the user a round of attention to reject.
 - **note** — worth knowing, changes nothing now.
 
 An inflated **question** spends the user's attention, which this lifecycle exists to protect; a
-**question** filed as a **note** ships an ambiguity into every ticket that follows.
+**question** filed as a **note** ships an ambiguity into every task that follows.
 
 ## Hold the criteria to this bar
 
@@ -103,12 +104,13 @@ question somebody should have asked.
 <!-- shared:budget:start source=budget.md -->
 **How much a call is allowed to cost is configured, not improvised.** `.agents/lifecycle.md` § *Effort
 and budget* sets, per role: the **model tier**, the **reasoning effort**, and a **soft output ceiling**.
-Read it before dispatching, and pass the tier and effort you find there.
+Read it before dispatching. Pass the tier; pass the effort too where your harness's dispatch takes one,
+and otherwise treat it as the effort this session should run at.
 
 Four levers, in the order they actually move cost:
 
-1. **How many calls** — the lens count. Six lenses cost three times two lenses, and this is the largest
-   lever by a distance.
+1. **How many agents** — every agent pays a fixed start-up cost, so grouping lenses into fewer reviewers
+   is the largest lever by a distance.
 2. **Which tier** — a cheap tier on a call whose shape is already written down.
 3. **How much effort** — reasoning effort per call, independent of tier.
 4. **The output ceiling** — how long a report may run.
@@ -127,7 +129,7 @@ Two rules that keep a budget honest:
 - **Report what a phase cost** when the run is over: calls made, tier each ran on, and anything that hit
   its ceiling. A budget nobody measures is a preference.
 - **A budget is a default, not a cap on judgement.** Where a call genuinely needs more — a diff far past
-  what one lens can hold, a security lens over a permission change — take the higher tier and **say in
+  what one reviewer can hold, a security lens over a permission change — take the higher tier and **say in
   one line that you did and why.** Silently overspending and silently underspending are the same defect.
 
 **A budget is tight because of the subscription, not the repo**, so `.agents/lifecycle.md` records which

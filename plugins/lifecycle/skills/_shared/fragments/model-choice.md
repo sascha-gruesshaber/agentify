@@ -1,24 +1,18 @@
-**The session model is a ceiling, not a per-agent default.** Picking the tier per call is part of
-orchestrating. An omitted model inherits the session's — usually the most expensive one.
+**The session builds; agents review and scout.** A call names its model only where this table says so.
+`.agents/lifecycle.md` § *Effort and budget* may lower a row for cost; it says so when it does.
 
-| Call | Model | Why |
-|---|---|---|
-| review, any lens | `sonnet` | One lens, a pinned range, a rule to quote, a terse report. Several run at once. |
-| scout / investigate | `sonnet` | Locating code and citing `file:line`. No design judgement. |
-| implement a **mechanical** slice | `sonnet` | The shape is already written down: a page copied from a named existing page, a rename across call sites, wiring that follows an existing seam, a regenerated client, documentation. |
-| implement a **design-carrying** slice | inherit | New seams, schema and wire contracts, permissions, concurrency. |
-| fix an already-triaged finding list | `sonnet` | Bounded work with the reasoning done. |
-| fix the whole-feature sweep | `opus` | Cross-cutting findings and the last write before review. |
+| Call | Model |
+|---|---|
+| build a plan's tasks, and fix what review found | the session's own model — in `/deliver`, no agent writes production code |
+| apply review comments a person wrote, via `/babysit` | `finding-fixer`, `sonnet` |
+| every `change-reviewer`: plan check, task review, screens review, each end-review reviewer | `opus` |
+| the `implementability` spec lens | `opus` |
+| the other spec lenses · scouting | `sonnet` |
 
-Three rules:
-
-- **Turn count beats token price.** A cheap model routinely takes two or three times the turns on
-  multi-step work, which costs more overall. Use the cheap tier when the brief contains the shape;
-  otherwise start one tier up.
-- **A `sonnet` agent that fails its gates twice on the same thing gets one re-run on `opus`** — the
-  failure is as likely to be the tier as the task. After that, re-scope or park.
-- **Escalate a reviewer deliberately**, not by default: for correctness or spec alignment over a sweep of
-  more than about fifteen changed files, or when a lens returned clean on a diff you have concrete reason
-  to distrust. Escalating every lens costs the price of the build again.
-
-Name the cheap-tier slices in the plan, so one go-ahead covers the choice.
+- **A tier above `opus` is allowed where one missed flaw would be expensive, and is never a
+  default.** Name each such step in the plan with one line on why.
+- **A `sonnet` agent blocked on execution gets one re-run on `opus`.** An `opus` agent that fails twice is
+  re-scoped, or its question left to the end review.
+- **Fewer agents beat thinner agents.** Every agent pays a fixed start-up cost before it reads a line —
+  on the order of 15–20k tokens — so merging two lenses into one reviewer saves more than trimming a
+  tool list or picking a cheaper tier.

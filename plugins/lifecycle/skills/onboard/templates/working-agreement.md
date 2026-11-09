@@ -33,6 +33,8 @@ work, which model each agent runs on, which existing library to use.
   recommendation.>
 - <Paths and commands exact.>
 - <Language: <English | the user's language>. Anything written to a shared board or repo is English.>
+- **Walkthrough language:** <English> — the spec and review walkthroughs are written for the person who
+  signs them off; specs, plans and commits stay English.
 
 ## Deliberately not adopted
 

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spec walkthrough</title>
+<!--
+  Walkthrough template: a spec walkthrough or a review walkthrough, committed as
+  spec-walkthrough.html or review-walkthrough.html beside the spec. Rules: show/SKILL.md, shape "walkthrough".
+
+  - Overview first, then each section one level deeper. Cut a section the change does not need.
+  - Pictures, lists and short sentences. Never restate what a picture shows.
+  - Tokens fall back to the page's own palette, so the file opens in a browser; rendered inline by a host
+    that sets these variables they take the host's (--card, --border, …) instead.
+  - The notes script is the same as page-template.html's; change both together.
+-->
+<style>
+  :root {
+    --wt-ground: #F4F6F8; --wt-panel: #FFFFFF; --wt-panel-2: #E8EDF2;
+    --wt-ink: #16212C; --wt-ink-2: #46535F; --wt-rule: #D5DCE3;
+    --wt-accent: #1D5C8A; --wt-you: #B8620E; --wt-you-soft: #F7E7D4;
+    --wt-heavy: #9C2F3A; --wt-heavy-soft: #F4DEE0; --wt-ok: #2F7A4F; --wt-ok-soft: #DDEFE3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --wt-ground: #11171D; --wt-panel: #18212A; --wt-panel-2: #202B35;
+      --wt-ink: #E6ECF1; --wt-ink-2: #AEBAC5; --wt-rule: #2C3743;
+      --wt-accent: #7DB4DE; --wt-you: #E9A55F; --wt-you-soft: #3A2A18;
+      --wt-heavy: #E58A93; --wt-heavy-soft: #3C1F24; --wt-ok: #79C79A; --wt-ok-soft: #19342A;
+      color-scheme: dark;
+    }
+  }
+  :root {
+    --panel: var(--card, var(--wt-panel)); --panel-2: var(--secondary, var(--wt-panel-2));
+    --ink: var(--foreground, var(--wt-ink)); --ink-2: var(--muted-foreground, var(--wt-ink-2));
+    --rule: var(--border, var(--wt-rule)); --accent: var(--primary, var(--wt-accent));
+    --you: var(--warning, var(--wt-you)); --you-soft: var(--warning-surface, var(--wt-you-soft));
+    --heavy: var(--destructive, var(--wt-heavy)); --heavy-soft: var(--destructive-surface, var(--wt-heavy-soft));
+    --ok: var(--success, var(--wt-ok)); --ok-soft: var(--wt-ok-soft);
+    --r: var(--radius, 8px);
+    --sans: var(--font-sans, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
+    --mono: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+    --serif: Georgia, "Iowan Old Style", serif;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--background, var(--wt-ground)); }
+  body { margin: 0; color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px max(16px, env(safe-area-inset-left, 0px)) 0 max(16px, env(safe-area-inset-right, 0px)); }
+  header { display: grid; gap: 10px; padding-bottom: 20px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); margin: 0; }
+  h1 { font-family: var(--serif); font-size: 30px; line-height: 1.12; margin: 0; text-wrap: balance; }
+  h2 { font-family: var(--serif); font-size: 22px; margin: 0 0 10px; text-wrap: balance; }
+  h3 { font-size: 15px; margin: 0 0 4px; padding-right: 26px; }
+  p { margin: 0 0 8px; }
+  section { margin: 0 0 36px; }
+  code { font-family: var(--mono); font-size: .86em; background: var(--panel-2); padding: 1px 5px; border-radius: 4px; }
+  ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; background: var(--panel-2); color: var(--ink-2); }
+  .chip.heavy { background: var(--heavy-soft); color: var(--heavy); }
+  .chip.medium { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+  .chip.light { background: var(--ok-soft); color: var(--ok); }
+  .box { position: relative; background: var(--panel); border: 1px solid var(--rule); border-radius: var(--r); padding: 14px 16px; min-width: 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .figure { overflow-x: auto; }
+  .figure img, .shot img { max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--rule); display: block; }
+  .copy { border-left: 4px solid var(--heavy); }
+  .raise { border: 2px solid var(--heavy); }
+  .screen { display: grid; gap: 10px; }
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; }
+  .shot figcaption { font-family: var(--mono); font-size: 11px; color: var(--ink-2); margin-top: 4px; }
+  ol.steps { margin: 0; padding-left: 20px; display: grid; gap: 2px; }
+  .expect { color: var(--ok); }
+  .decision .rec { color: var(--ink-2); font-size: 14px; }
+  .decision .rec b { color: var(--you); }
+  details summary { cursor: pointer; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  td { padding: 6px 34px 6px 6px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  td.n { font-family: var(--mono); color: var(--ink-2); width: 3ch; padding-right: 6px; }
+  .signoff { border: 2px solid var(--you); background: var(--you-soft); }
+  .missing { border-left: 4px solid var(--you); padding: 6px 10px; background: var(--you-soft); }
+  pre { overflow-x: auto; background: var(--panel-2); padding: 8px 10px; border-radius: 6px; }
+  /* notes machinery: same as page-template.html */
+  [data-note] { position: relative; }
+  .noteBtn { position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 5px; border: 1px solid var(--rule); background: var(--panel-2); color: var(--ink-2); font-size: 13px; line-height: 1; cursor: pointer; display: grid; place-items: center; padding: 0; opacity: .55; }
+  [data-note]:hover > .noteBtn, td:hover > .noteBtn, .noteBtn.has { opacity: 1; }
+  .noteBtn.has { background: var(--you); border-color: var(--you); color: var(--panel); }
+  .noteBox { margin-top: 10px; display: none; }
+  .noteBox.open { display: block; }
+  .noteBox textarea { width: 100%; min-height: 60px; resize: vertical; background: var(--panel-2); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; font: inherit; font-size: 13.5px; }
+  .noteBox .hint { font-family: var(--mono); font-size: 10.5px; color: var(--ink-2); margin-top: 4px; }
+  .tray { position: sticky; bottom: 0; background: var(--popover, var(--wt-panel)); border: 1px solid var(--rule); border-radius: var(--r); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 14px; margin-top: 12px; padding-bottom: max(10px, env(safe-area-inset-bottom, 0px)); }
+  .tray .count { font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
+  .tray .spacer { flex: 1; }
+  .btn { font: inherit; font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--rule); background: var(--panel-2); color: var(--ink); cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--primary-foreground, #fff); }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn.armed { border-color: var(--heavy); color: var(--heavy); }
+  button:focus-visible, textarea:focus-visible { outline: 2px solid var(--you); outline-offset: 2px; }
+  .out { display: none; flex-basis: 100%; }
+  .out.open { display: grid; gap: 8px; }
+  .out textarea { width: 100%; min-height: 150px; background: var(--code-background, var(--panel-2)); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; padding: 10px; font-family: var(--mono); font-size: 12px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none; } }
+  @media (max-width: 640px) { .noteBtn { opacity: 1; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">&lt;KEY&gt; · Spec walkthrough · DD Month YYYY</p>
+    <h1>What changes, in one sentence</h1>
+    <div class="chips"><span class="chip medium">Review tier: medium</span><span class="chip">Risk: none</span></div>
+  </header>
+
+  <!-- REVIEW ONLY, when /deliver raised the tier: the raise and its reason, plus the spec-walkthrough
+       content the lower tier skipped. Delete otherwise. -->
+  <section class="box raise" data-note data-label="Raise">
+    <h2>Raised to heavy</h2>
+    <p>The reason, in one sentence.</p>
+  </section>
+
+  <!-- 1 · Overview: what changes, the tier, the one picture that explains it best. -->
+  <section data-note data-label="Overview">
+    <h2>Overview</h2>
+    <ul>
+      <li>What the user can do afterwards.</li>
+      <li>What runs differently to get there.</li>
+    </ul>
+    <div class="figure" style="margin-top:12px"><!-- inline SVG or a small grid diagram --></div>
+  </section>
+
+  <!-- 2 · How it is solved, to the depth a lead developer needs. One box per mechanism. -->
+  <section>
+    <h2>How it is solved</h2>
+    <div class="grid">
+      <div class="box" data-note data-label="Solution · part A"><h3>Part A</h3><p>One or two sentences.</p></div>
+    </div>
+  </section>
+
+  <!-- 3 · What later work will copy. Always shown for heavy. -->
+  <section>
+    <h2>What later work will copy</h2>
+    <div class="box copy" data-note data-label="Pattern · name"><h3>The pattern</h3><p>Where it lives, and why it is shaped this way.</p></div>
+  </section>
+
+  <!-- 4 · SPEC: a UI mock per changed flow. REVIEW: every changed screen, with the images the preview took
+       (as data: URIs) and the review command from .agents/preview.md. A screen new in this change has no
+       "Before". Keep the `.missing` line only when an input was missing, and say which and why. -->
+  <section>
+    <h2>Screens</h2>
+    <p>Run this in the review branch's tree. It starts the app, seeds the scenario and prints the links:</p>
+    <pre><code>&lt;the review command from .agents/preview.md, with the scenario and the changed screens&gt;</code></pre>
+    <p class="missing">No images: the preview did not start on the build machine (the reason).</p>
+    <div class="box screen" data-note data-label="Screen · name">
+      <h3>Screen name</h3>
+      <ol class="steps">
+        <li>Open the link for <code>&lt;route&gt;</code>.</li>
+        <li>Click …</li>
+        <li class="expect">You see …</li>
+      </ol>
+      <div class="shots">
+        <figure class="shot"><!-- <img src="data:image/jpeg;base64,…" alt="Before"> --><figcaption>Before</figcaption></figure>
+        <figure class="shot"><!-- <img src="data:image/jpeg;base64,…" alt="After"> --><figcaption>After</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · REVIEW: decisions marked Confirm? yes, each with the recommendation already built.
+       SPEC: one-way doors and what is left out. -->
+  <section>
+    <h2>Decisions</h2>
+    <div class="grid">
+      <div class="box decision" data-note data-label="Decision 1"><h3>The decision</h3><p class="rec"><b>Built:</b> the recommendation. The alternative: …</p></div>
+    </div>
+  </section>
+
+  <!-- 6 · REVIEW, heavy: where to read in the code, and the architecture documents .agents/docs.md names. -->
+  <section>
+    <h2>Where to read</h2>
+    <ul><li><code>path/to/file</code>, where the new pattern lives</li><li><a href="#">the architecture document</a></li></ul>
+  </section>
+
+  <!-- 7 · Detail last, collapsed: the numbered requirements, one line each. -->
+  <section>
+    <details>
+      <summary>The requirements in detail</summary>
+      <table><tbody>
+        <tr data-note data-label="Requirement 1"><td class="n">1</td><td>One line.</td></tr>
+      </tbody></table>
+    </details>
+  </section>
+
+  <section class="box signoff" data-note data-label="Sign-off">
+    <h2>Sign-off</h2>
+    <p>All good? Say so in the chat. Otherwise: <strong>+</strong> on a block, then <strong>Copy for Claude</strong> and paste it back.</p>
+  </section>
+
+  <div class="tray">
+    <span class="count" id="count">No notes yet.</span>
+    <span class="spacer"></span>
+    <button class="btn" id="clearBtn" type="button" disabled>Clear all</button>
+    <button class="btn primary" id="copyBtn" type="button" disabled>Copy for Claude</button>
+    <div class="out" id="outWrap">
+      <textarea id="out" readonly aria-label="Your notes, ready to paste"></textarea>
+      <div><button class="btn primary" id="doCopy" type="button">Copy to clipboard</button> <span class="count" id="copyState"></span></div>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  // Same notes machinery as page-template.html: keyed by data-label, tray resolved before the wiring loop.
+  var STORE = `notes-${(document.title || "page").replace(/\W+/g, "-").toLowerCase()}`;
+  var notes = {};
+  try { const raw = localStorage.getItem(STORE); if (raw) notes = JSON.parse(raw); } catch { notes = {}; }
+  function persist() { try { localStorage.setItem(STORE, JSON.stringify(notes)); } catch (_e) {} }
+
+  var countEl = document.getElementById("count");
+  var copyBtn = document.getElementById("copyBtn");
+  var clearBtn = document.getElementById("clearBtn");
+  var outWrap = document.getElementById("outWrap");
+  var out = document.getElementById("out");
+  var armed = null;
+
+  function build() {
+    var lines = [`Notes on "${document.title}":`, ""];
+    order.forEach((l) => { if (notes[l]) lines.push(`- **${l}** — ${notes[l]}`); });
+    return lines.join("\n");
+  }
+  function tray() {
+    if (armed !== null) disarm();
+    var n = order.filter((l) => notes[l]).length; // only blocks still on the page; a dropped block's note stays out
+    countEl.textContent = n === 0 ? "No notes yet." : `${n} ${n === 1 ? "note" : "notes"} ready.`;
+    copyBtn.disabled = n === 0;
+    clearBtn.disabled = n === 0;
+    if (outWrap.classList.contains("open")) out.value = build();
+  }
+
+  var order = [];
+  document.querySelectorAll("[data-note]").forEach((host, i) => {
+    var label = host.dataset.label || `Block ${i + 1}`;
+    order.push(label);
+    var btn = document.createElement("button");
+    btn.className = "noteBtn"; btn.type = "button"; btn.textContent = "+";
+    btn.setAttribute("aria-label", `Note on: ${label}`);
+    var box = document.createElement("div"); box.className = "noteBox";
+    var ta = document.createElement("textarea");
+    ta.id = `note-${label.replace(/\W+/g, "-").toLowerCase()}`;
+    ta.placeholder = `Your note on "${label}"…`;
+    ta.value = notes[label] || "";
+    var hint = document.createElement("div"); hint.className = "hint"; hint.textContent = label;
+    box.appendChild(ta); box.appendChild(hint);
+    function refresh() {
+      var has = ta.value.trim().length > 0;
+      btn.classList.toggle("has", has); btn.textContent = has ? "●" : "+";
+      if (has) notes[label] = ta.value.trim(); else delete notes[label];
+      persist(); tray();
+    }
+    ta.addEventListener("input", refresh);
+    btn.addEventListener("click", (e) => { e.stopPropagation(); if (box.classList.toggle("open")) ta.focus(); });
+    if (host.tagName === "TR") { var cell = host.lastElementChild; cell.style.position = "relative"; cell.appendChild(btn); cell.appendChild(box); }
+    else { host.appendChild(btn); host.appendChild(box); }
+    refresh();
+  });
+
+  copyBtn.addEventListener("click", () => { out.value = build(); outWrap.classList.add("open"); out.focus(); out.select(); });
+  document.getElementById("doCopy").addEventListener("click", () => {
+    var st = document.getElementById("copyState");
+    out.select();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(out.value).then(() => { st.textContent = "Copied."; }, () => { st.textContent = "Select the text and copy it by hand."; });
+      return;
+    }
+    var ok = false; try { ok = document.execCommand("copy"); } catch (_e) {}
+    st.textContent = ok ? "Copied." : "Select the text and copy it by hand.";
+  });
+  function disarm() { clearTimeout(armed); armed = null; clearBtn.textContent = "Clear all"; clearBtn.classList.remove("armed"); }
+  // Two taps, never confirm(): a sandboxed viewer blocks alert/confirm/prompt.
+  clearBtn.addEventListener("click", () => {
+    if (armed === null) { clearBtn.textContent = "Tap again to clear"; clearBtn.classList.add("armed"); armed = setTimeout(disarm, 4000); return; }
+    disarm(); notes = {}; persist();
+    document.querySelectorAll(".noteBox textarea").forEach((t) => { t.value = ""; });
+    document.querySelectorAll(".noteBtn").forEach((b) => { b.classList.remove("has"); b.textContent = "+"; });
+    outWrap.classList.remove("open"); tray();
+  });
+  tray();
+})();
+</script>
+</body>
+</html>

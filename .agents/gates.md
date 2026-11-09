@@ -10,7 +10,7 @@ the authority on what blocks a merge**, not this one — if they disagree, fix t
 cd plugins/lifecycle
 node skills/_shared/tools/skills.mjs sync     # only after editing a fragment — rewrites the injected copies
 node skills/_shared/tools/skills.mjs check    # must print "clean"
-node --test "skills/_shared/tools/skills.test.mjs"
+node --test "skills/_shared/tools/skills.test.mjs" "skills/_shared/tools/spec-gate.test.mjs" "skills/show/check-page.test.mjs"
 ```
 
 **Edit the fragment, never the injected copy.** `check` fails on a drifted region, on a document
@@ -32,19 +32,20 @@ marked as one, or a sentence about how to *find* the real answer.
 
 ## Where a local run is weaker than CI
 
-**This is the most valuable section in this file.** Five of the eight CI steps exist only as inline
-`node` scripts in the workflow. There is no local runner for them.
+**This is the most valuable section in this file.** Five of the nine CI steps exist only as inline
+`node` scripts in the workflow. There is no local runner for them. Find each step in `ci.yml` by its name.
 
-| CI step | Lines | What it rejects | Locally |
-|---|---|---|---|
-| fragments are in sync | `ci.yml:19-21` | a drifted injected region | ✅ same command |
-| fragment tooling tests | `ci.yml:23-25` | a broken `skills.mjs` | ✅ same command |
-| every manifest parses | `ci.yml:27-31` | invalid JSON in any manifest | ❌ CI only |
-| marketplace and plugin versions agree | `ci.yml:33-50` | a version bumped in one file but not the other | ❌ CI only |
-| no repo-specific commands leaked | `ci.yml:54-64` | a concrete build command inside a skill | ✅ grep above |
-| every skill has a name and a description | `ci.yml:66-83` | frontmatter missing `name:` or `description:` | ❌ CI only |
-| no skill blocks model invocation | `ci.yml:88-97` | `disable-model-invocation` anywhere | ✅ grep above |
-| every command has a description, and forwards to a skill that exists | `ci.yml:100-120` | a command pointing at a skill that is not there | ❌ CI only |
+| CI step | What it rejects | Locally |
+|---|---|---|
+| fragments are in sync | a drifted injected region | ✅ same command |
+| fragment tooling tests | a broken `skills.mjs` | ✅ same command |
+| spec gate and page check tests | a broken `spec-gate.mjs` or `check-page.mjs` | ⚠️ the same tests, but `check-page`'s two wiring tests **skip** unless `jsdom` is installed in `plugins/lifecycle/` — CI installs it |
+| every manifest parses | invalid JSON in any manifest | ❌ CI only |
+| marketplace and plugin versions agree | a version bumped in one file but not the other | ❌ CI only |
+| no repo-specific commands leaked into the skills | a concrete build command inside a skill | ✅ grep above |
+| every skill has a name and a description | frontmatter missing `name:` or `description:` | ❌ CI only |
+| no skill blocks model invocation | `disable-model-invocation` anywhere | ✅ grep above |
+| every command has a description, and forwards to a skill that exists | a command pointing at a skill that is not there | ❌ CI only |
 
 So a clean local run is **not** green. Green means the CI job passed:
 
@@ -67,9 +68,9 @@ Stated once, there, deliberately.
 `node skills/_shared/tools/skills.mjs sync` **writes into 18 tracked documents** — every managed
 region in `plugins/lifecycle/skills/**` and `plugins/lifecycle/agents/**`.
 
-**A ticket that edits a file under `skills/_shared/fragments/` runs alone, never in a parallel wave.**
-Two worktrees each syncing the same fragment produce conflicting copies across up to 18 files, and the
-conflict is in generated text nobody wrote. See [`lifecycle.md`](lifecycle.md) § *Parallelism*.
+**Two features that both edit a file under `skills/_shared/fragments/` conflict in up to 18 files** of
+generated text nobody wrote. Resolve by merging the fragments and running `sync` again, never by hand.
+See [`lifecycle.md`](lifecycle.md) § *Worktrees*.
 
 ## What "test-first" means here, because it means two things
 
@@ -78,7 +79,7 @@ ends up with a test that asserts prose is still present.
 
 | Area | The seam | Test-first? |
 |---|---|---|
-| `plugins/lifecycle/skills/_shared/tools/*.mjs` | `skills.test.mjs`, `node:test` | **yes — real red-green.** This is the only unit-testable code here. |
+| `plugins/lifecycle/skills/_shared/tools/*.mjs`, `plugins/lifecycle/skills/show/check-page.mjs` | `skills.test.mjs`, `spec-gate.test.mjs`, `check-page.test.mjs`, `node:test` | **yes — real red-green.** This is the only unit-testable code here. |
 | `plugins/lifecycle/skills/**/SKILL.md`, `agents/**` | `skills.mjs check` + the CI frontmatter and leak steps | **no unit test is possible.** The gate is the check, plus a reinstall run for a behaviour change. |
 | `.claude-plugin/**`, `plugins/*/.claude-plugin/**` | the version-agreement CI step | no — the gate is the pair being bumped together |
 | `README.md`, `CONTRIBUTING.md`, `ATTRIBUTION.md` | none | no |
@@ -89,6 +90,6 @@ change, the honest evidence is the check output and, where behaviour moved, a re
 ## Coverage and scanners
 
 **NOT CONFIGURED.** No coverage tool, no floor, no scanner, no quality gate. To fill this in, this repo
-would need a coverage runner over `skills/_shared/tools/` — currently the only measurable code.
+would need a coverage runner over the three `.mjs` tools — currently the only measurable code.
 
 ## Never `--no-verify`.

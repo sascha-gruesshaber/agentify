@@ -21,7 +21,7 @@ There is no third move.
 cd plugins/lifecycle
 node skills/_shared/tools/skills.mjs sync     # after editing any fragment
 node skills/_shared/tools/skills.mjs check    # must be clean
-node --test "skills/_shared/tools/skills.test.mjs"
+node --test "skills/_shared/tools/skills.test.mjs" "skills/_shared/tools/spec-gate.test.mjs" "skills/show/check-page.test.mjs"
 ```
 
 **Edit the fragment, never the injected copy.** `check` fails on a drifted region, on a document missing
@@ -42,7 +42,7 @@ answer. A hit that reads as an instruction is a bug.
 
 **This plugin exists because upstream skills carry that flag.** It makes a skill un-invokable by the
 model, so a flow built on it stalls and asks the user to type the next command — which is exactly what
-`/advance` and `/build` cannot survive, since their whole shape is skills calling skills.
+`/advance` and `/deliver` cannot survive, since their whole shape is skills calling skills.
 
 CI fails the build if the string appears anywhere under `plugins/*/skills` or `plugins/*/commands`. If you
 ever vendor a skill in from elsewhere, **strip the flag as part of vendoring it.**
@@ -89,7 +89,7 @@ Read this before relying on the plugin for work that matters. Each line is a thi
 but has not been *run*.
 
 1. ~~Cross-skill calls across the plugin boundary.~~ **Proven** — `/onboard` chained to `/frame`, and
-   `/build` resolves `/plan` and `/plan-check` by name.
+   the build skill resolves `/plan` and `/plan-check` by name.
 2. ~~`/onboard` against a repo it did not come from.~~ **Proven** — run on this repo. It read the CI
    definition, mapped all eight steps to line numbers, wrote `NOT CONFIGURED` three times rather than
    inventing, and found two hazards nobody had written down.
@@ -100,14 +100,18 @@ but has not been *run*.
    and reported a stale count as a note rather than silently editing.
 5. **A clean review still costs a judgement call.** The reviewers now return `clean` plus at most three
    lines of what they checked. The cap is an instruction, and nothing enforces it.
-6. **`/build` has never run end to end.** Everything before it is now exercised: `/onboard` on a foreign
-   repo, a second `/onboard` that changed nothing, a cross-plugin skill call, and a review lens that
-   caught a planted violation *and* a real one. `/build` is the remaining unknown, and it is the largest
-   skill here.
-7. **The `Effort` column in `.agents/lifecycle.md` is intent, not a setting.** The `Agent` tool takes a
-   `model` but no effort parameter, so a skill dispatching through it cannot set effort. The column says
-   which calls deserve a high-effort *session*; the tier, the ceiling and the lens count are the levers
-   that actually pass.
+6. **`/deliver`, `/ship` and `/babysit` have not run end to end from this plugin.** The process they
+   encode — the session builds, fresh agents review, walkthroughs before and after — is the one the
+   source repo builds with today, but the generic wording, the ship-mode routing and the preview seam
+   are new here, and so is the sign-off flow (`/spec`'s walkthrough → `spec-gate.mjs sign` → the gate
+   refusing an edited spec in `/plan`, `/deliver` and `/advance`). `/deliver` is the largest skill and the
+   first to prove.
+7. **The `Effort` column in `.agents/lifecycle.md` only binds where the harness passes it.** Some
+   subagent dispatches take an effort and some do not, and the plugin does not depend on either. Where
+   it cannot be passed, the column says which calls deserve a high-effort *session*; the tier, the
+   ceiling and the number of agents are the levers that always pass.
+8. **`/onboard`'s ship-mode recommendation and preview detection are unexercised.** Re-running it on a
+   repo with a UI and a forge CLI is what proves both.
 
 ## Adding a plugin to the marketplace
 

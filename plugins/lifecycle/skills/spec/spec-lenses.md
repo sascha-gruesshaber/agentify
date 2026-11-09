@@ -63,8 +63,8 @@ lifecycle, and it sits upstream of the most expensive one.
 > makes about how the system works today that those documents contradict.
 
 **testability**
-> `/build` passes the named seams to its implementers verbatim as *where to write tests*, so vagueness
-> here costs quality downstream. Against the testing rules in `.agents/gates.md` and
+> `/plan` turns the named seams into each task's *where to write tests*, so vagueness here costs
+> quality downstream. Against the testing rules in `.agents/gates.md` and
 > `.agents/docs.md`, find: named seams that are not seams or do not exist; behaviour in the
 > requirements with no seam named at all; a test level that cannot fail for the right reason, or one
 > that could be cheaper; prior art cited that does not match. Then the coverage floor in

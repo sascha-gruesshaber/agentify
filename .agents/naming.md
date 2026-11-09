@@ -15,8 +15,6 @@ grammar offers a `<KEY>-` prefix, this repo drops it.
 - **Types in use:** `feat | fix | docs | chore` — observed in history. `refactor | test | build` are
   allowed and unused so far.
 - **Observed example:** `chore/onboard-itself`.
-- **Per-ticket branches** suffix `-t<NN>`, never `/t<NN>` — git refuses a branch nested under an
-  existing branch name. They are local scaffolding: never pushed, deleted after integration.
 - **Branch model:** trunk-based off `main`. No `develop`, no `release/*`.
 
 ## Commits
@@ -35,7 +33,8 @@ grammar offers a `<KEY>-` prefix, this repo drops it.
 - **The body carries real weight in this repo.** History uses multi-paragraph bodies that say what was
   wrong and why the fix is shaped as it is. Match that; a one-line body on a design change is
   under-documented here.
-- **One commit per ticket.** The implement-then-fix split is scaffolding the history should not remember.
+- **One commit per plan task**, and each review fix round its own commit, so a reviewed range stays as it
+  was reviewed.
 - **Trailer:** none. There is no ticket to reference.
 - **Never `--no-verify`.**
 
@@ -52,7 +51,8 @@ history look like two projects.
 
 ## Tests
 
-Only `plugins/lifecycle/skills/_shared/tools/skills.test.mjs` exists, and it sets the grammar:
+Three test files exist — `skills.test.mjs` and `spec-gate.test.mjs` under `plugins/lifecycle/skills/_shared/tools/`,
+and `check-page.test.mjs` under `plugins/lifecycle/skills/show/` — and they share one grammar:
 
 ```js
 test('<subject> <the behaviour asserted>', () => { … })

@@ -20,7 +20,7 @@ made, not a default.
   expensive to reverse. In this repo, "user-visible" and "expensive to reverse" mean:
   - **the public contract of a skill or command** — its name, its frontmatter `description` (which is how
     the model decides to load it), or the phase it hands off to;
-  - **the shape of `.agents/`** — adding, removing or renaming one of the eight files, or a section other
+  - **the shape of `.agents/`** — adding, removing or renaming one of the nine files, or a section other
     skills read, because every consumer repo's install then disagrees with the templates;
   - **a version bump** that puts a change in front of consumers, since the marketplace cache is keyed on
     it and there is no way to un-ship;
@@ -43,6 +43,7 @@ tier, which findings to fix, which model each agent runs on.
   recommendation.
 - **Paths and commands exact.** Never paraphrased.
 - **Language:** English for everything written to the repo, whatever language the session ran in.
+- **Walkthrough language:** English — moot while review tiers are off, set so a later switch-on has an answer.
 
 ## Deliberately not adopted
 
